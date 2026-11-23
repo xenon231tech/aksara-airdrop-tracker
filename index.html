@@ -504,7 +504,7 @@
     <section class="panel">
       <div class="field">
         <label for="convAmount" id="convAmountLabel">USD</label>
-        <input id="convAmount" type="number" min="0" step="any" placeholder="100" inputmode="decimal">
+        <input id="convAmount" type="number" min="0" step="any" placeholder="100" value="100" inputmode="decimal">
       </div>
       <div class="set-actions" id="convChips" style="margin-bottom:12px">
         <button class="btn btn-ghost btn-sm" data-conv-amt="1">1</button>
@@ -2919,6 +2919,7 @@
     });
   }
   applyTheme();
+  applyI18n();
   render();
   renderSettingsForm();
   maybeNotify();
