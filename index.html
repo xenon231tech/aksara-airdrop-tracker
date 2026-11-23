@@ -1353,7 +1353,7 @@
       pointHistory: ph,
       archived: !!it.archived,
       tags: (Array.isArray(it.tags) ? it.tags : String(it.tags || "").split(",")).map(function(x){ return String(x).trim(); }).filter(function(x){ return x; }).slice(0, 8),
-      color: COLOR_MAP[it.color] ? it.color : "",
+      color: (typeof COLOR_MAP !== "undefined" && COLOR_MAP[it.color]) ? it.color : "",
       tasks: Array.isArray(it.tasks) ? it.tasks.map(normalizeTask) : [],
       createdAt: it.createdAt || Date.now(), updatedAt: it.updatedAt || Date.now() };
   }
@@ -1389,10 +1389,10 @@
     if(migrated && list.length){ try { saveItems(list); } catch(e){} }
     if(!list.length){
       try {
-        if(!localStorage.getItem(SEED_FLAG)){
+        if(!localStorage.getItem("airdrop-tracker-seeded-v1")){
           list = seedItems().map(normalizeItem);
           saveItems(list);
-          localStorage.setItem(SEED_FLAG, "1");
+          localStorage.setItem("airdrop-tracker-seeded-v1", "1");
         }
       } catch(e){}
     }
