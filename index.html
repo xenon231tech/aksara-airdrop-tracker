@@ -1666,18 +1666,18 @@
   }
 
   /* ---------- render: grid ---------- */
-  function taskRowHtml(it, t){
-    var checked = taskChecked(t);
-    var st = t.daily ? streakOf(t) : 0;
-    var isWeekly = t.weekly || t.repeat === "weekly";
+  function taskRowHtml(it, tk){
+    var checked = taskChecked(tk);
+    var st = tk.daily ? streakOf(tk) : 0;
+    var isWeekly = tk.weekly || tk.repeat === "weekly";
     return '<div class="task' + (checked ? " done" : "") + '">' +
-      '<button class="check' + (checked ? " done" : "") + '" data-task="' + it.id + ":" + t.id + '" aria-label="Mark task"></button>' +
-      '<span class="t-text">' + esc(t.text) + '</span>' +
-      (t.daily ? '<span class="daily-tag">' + esc(t("dailyTag")) + '</span>' : "") +
+      '<button class="check' + (checked ? " done" : "") + '" data-task="' + it.id + ":" + tk.id + '" aria-label="Mark task"></button>' +
+      '<span class="t-text">' + esc(tk.text) + '</span>' +
+      (tk.daily ? '<span class="daily-tag">' + esc(t("dailyTag")) + '</span>' : "") +
       (isWeekly ? '<span class="weekly-tag">' + esc(t("weeklyTag")) + '</span>' : "") +
       (st >= 1 ? '<span class="streak">' + st + ' ' + esc(t("streakWord")) + '</span>' : "") +
-      '<button class="proof-btn' + (t.proof ? " has-proof" : "") + '" data-proof="' + it.id + ":" + t.id + '" aria-label="Attach or view proof">' + SVG_CLIP + '</button>' +
-      '<button class="t-del" data-task-del="' + it.id + ":" + t.id + '" aria-label="Delete task">' + SVG_X + '</button></div>';
+      '<button class="proof-btn' + (tk.proof ? " has-proof" : "") + '" data-proof="' + it.id + ":" + tk.id + '" aria-label="Attach or view proof">' + SVG_CLIP + '</button>' +
+      '<button class="t-del" data-task-del="' + it.id + ":" + tk.id + '" aria-label="Delete task">' + SVG_X + '</button></div>';
   }
   function addTaskRowHtml(it, ph){
     return '<div class="add-task"><input type="text" placeholder="' + esc(ph) + '" data-add-task="' + it.id + '">' +
@@ -2024,20 +2024,20 @@
       html += '<div class="task-group"><h3>' + esc(it.name) +
         (it.link ? '<a href="' + esc(it.link) + '" target="_blank" rel="noopener">' + esc(t("openWord")) + '</a>' : "") + '</h3>';
       html += '<div class="tasks">';
-      visTasks.forEach(function(t){
-        var checked = taskChecked(t);
-        var st = t.daily ? streakOf(t) : 0;
-        var lc = t.daily ? lastCheckin(t) : "";
-        var isWeekly = t.weekly || t.repeat === "weekly";
+      visTasks.forEach(function(tk){
+        var checked = taskChecked(tk);
+        var st = tk.daily ? streakOf(tk) : 0;
+        var lc = tk.daily ? lastCheckin(tk) : "";
+        var isWeekly = tk.weekly || tk.repeat === "weekly";
         html += '<div class="task' + (checked ? " done" : "") + '">' +
-          '<button class="check' + (checked ? " done" : "") + '" data-task="' + it.id + ":" + t.id + '" aria-label="Mark task"></button>' +
-          '<span class="t-text">' + esc(t.text) + '</span>' +
-          (t.daily ? '<span class="daily-tag">' + esc(t("dailyTag")) + '</span>' : "") +
+          '<button class="check' + (checked ? " done" : "") + '" data-task="' + it.id + ":" + tk.id + '" aria-label="Mark task"></button>' +
+          '<span class="t-text">' + esc(tk.text) + '</span>' +
+          (tk.daily ? '<span class="daily-tag">' + esc(t("dailyTag")) + '</span>' : "") +
           (isWeekly ? '<span class="weekly-tag">' + esc(t("weeklyTag")) + '</span>' : "") +
           (st >= 1 ? '<span class="streak">' + st + ' ' + esc(t("streakWord")) + '</span>' : "") +
           (lc ? '<span class="last-check">' + esc(t("lastCheckin")) + ' ' + fmtDate(lc) + '</span>' : "") +
-          '<button class="proof-btn' + (t.proof ? " has-proof" : "") + '" data-proof="' + it.id + ":" + t.id + '" aria-label="Attach or view proof">' + SVG_CLIP + '</button>' +
-          '<button class="t-del" data-task-del="' + it.id + ":" + t.id + '" aria-label="Delete task">' + SVG_X + '</button></div>';
+          '<button class="proof-btn' + (tk.proof ? " has-proof" : "") + '" data-proof="' + it.id + ":" + tk.id + '" aria-label="Attach or view proof">' + SVG_CLIP + '</button>' +
+          '<button class="t-del" data-task-del="' + it.id + ":" + tk.id + '" aria-label="Delete task">' + SVG_X + '</button></div>';
       });
       html += addTaskRowHtml(it, t("addTaskPh")) + '</div></div>';
     });
