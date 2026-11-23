@@ -36,22 +36,24 @@
     background:var(--bg); color:var(--ink); min-height:100vh;
     -webkit-font-smoothing:antialiased;
   }
-  .wrap{max-width:1020px; margin:0 auto; padding:20px 16px 110px}
+  .wrap{max-width:1020px; margin:0 auto; padding:20px 16px 132px}
+  html{scroll-padding-bottom:150px}
+  #view-calendar, #view-tasks, #view-converter, #view-settings{min-height:calc(100dvh - 152px)}
 
   /* Hero */
   .hero{
     background:linear-gradient(120deg,#f97316 0%,#ec4899 48%,#8b5cf6 100%);
-    border-radius:28px; color:#fff; padding:28px 24px 24px;
+    border-radius:28px; color:#fff; padding:22px 24px 20px;
     box-shadow:0 18px 40px -18px rgba(236,72,153,.55);
   }
-  .hero h1{font-size:30px; font-weight:800; letter-spacing:-.5px}
+  .hero h1{font-size:28px; font-weight:800; letter-spacing:-.5px}
   .hero p{opacity:.92; margin-top:6px; font-size:14px; max-width:560px; line-height:1.55}
-  .stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin-top:20px}
+  .stats{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:14px}
   .stat{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.28);
     border-radius:16px; padding:12px 14px; backdrop-filter:blur(4px)}
   .stat b{display:block; font-size:22px; font-weight:800; line-height:1.15; overflow-wrap:anywhere}
   .stat span{font-size:11px; opacity:.9; font-weight:700; letter-spacing:.3px}
-  @media (max-width:640px){ .hero h1{font-size:25px} }
+  @media (max-width:640px){ .hero h1{font-size:25px} .stats{grid-template-columns:repeat(2,1fr)} }
 
   /* Section titles */
   .sec-title{font-size:17px; font-weight:800; margin:26px 0 10px; display:flex; align-items:baseline; gap:8px; flex-wrap:wrap}
@@ -86,15 +88,17 @@
     display:flex; align-items:center; justify-content:center; font-size:28px; font-weight:800}
   .profile-info{flex:1; min-width:220px}
   .profile-name{font-size:18px; font-weight:800}
-  .profile-links{display:flex; flex-wrap:wrap; gap:6px; margin-top:10px}
-  .social-chip{display:inline-flex; align-items:center; gap:5px; font-size:12.5px; font-weight:700;
+  .profile-links{display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:6px; margin-top:10px; width:100%}
+  .social-chip{display:inline-flex; align-items:center; justify-content:center; gap:5px; font-size:12.5px; font-weight:700;
     color:var(--ink); background:var(--soft); border:1px solid var(--line); border-radius:999px;
     padding:6px 11px; text-decoration:none}
   .social-chip:hover{border-color:var(--pink)}
   .social-chip small{color:var(--muted); font-weight:600}
 
   /* Toolbar */
-  .toolbar{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin:20px 0 12px}
+  .toolbar{display:flex; flex-direction:column; gap:10px; margin:20px 0 12px}
+  .toolbar-row{display:flex; flex-wrap:wrap; gap:10px; align-items:center}
+  .toolbar-row .search{flex:1; min-width:200px}
   .search{flex:1; min-width:200px; display:flex; align-items:center; gap:8px;
     background:var(--chip-bg); border:1.5px solid var(--line); border-radius:999px; padding:10px 16px}
   .search input{border:0; outline:0; width:100%; font:inherit; font-size:14px; color:var(--ink); background:transparent}
@@ -114,6 +118,11 @@
   body.dark .chip.active{background:#ec4899; border-color:#ec4899}
   .select{font:inherit; font-size:13px; font-weight:700; color:var(--ink); background:var(--chip-bg);
     border:1.5px solid var(--line); border-radius:999px; padding:8px 12px; outline:0; cursor:pointer}
+  @media (max-width:640px){
+    .filters{flex-wrap:nowrap; overflow-x:auto; padding-bottom:4px; scrollbar-width:thin}
+    .filters .chips{flex-wrap:nowrap}
+    .filters .select{flex:none}
+  }
 
   /* Cards */
   .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px; margin-top:14px}
@@ -172,7 +181,7 @@
   .proof-btn svg{width:14px; height:14px}
   .task .t-del{display:inline-flex; align-items:center; justify-content:center}
   .t-del svg, .prof-row button svg{width:13px; height:13px}
-  .add-task{display:flex; gap:8px; margin-top:6px}
+  .add-task{display:flex; gap:8px; margin-top:6px; flex-wrap:wrap}
   .add-task input{flex:1; font:inherit; font-size:13px; border:1.5px solid var(--line); border-radius:999px; padding:8px 12px; outline:0; min-width:0; background:var(--input-bg); color:var(--ink)}
   .add-task input:focus{border-color:var(--pink)}
   .add-task button{border:0; background:var(--plum); color:#fff; font:inherit; font-size:13px; font-weight:700; border-radius:999px; padding:8px 14px; cursor:pointer}
@@ -184,10 +193,10 @@
   .link-btn{display:inline-flex; align-items:center; gap:6px; color:var(--pink); font-weight:700; font-size:13px; text-decoration:none}
   .link-btn:hover{text-decoration:underline}
 
-  .empty{background:var(--card); border:1.5px dashed #e9c6de; border-radius:24px; padding:44px 24px; text-align:center}
-  .empty .glyph svg{width:44px; height:44px; display:block; margin:0 auto}
-  .empty h2{font-size:19px; margin:10px 0 6px}
-  .empty p{color:var(--muted); font-size:14px; line-height:1.6; max-width:460px; margin:0 auto 18px}
+  .empty{background:var(--card); border:1.5px dashed #e9c6de; border-radius:24px; padding:26px 20px; text-align:center}
+  .empty .glyph svg{width:36px; height:36px; display:block; margin:0 auto}
+  .empty h2{font-size:19px; margin:8px 0 4px}
+  .empty p{color:var(--muted); font-size:14px; line-height:1.6; max-width:460px; margin:0 auto 14px}
 
   /* Calendar */
   .cal-head{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px}
@@ -197,7 +206,8 @@
   .cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:4px}
   .cal-dow{font-size:11px; font-weight:800; color:var(--muted); text-align:center; padding:6px 0}
   .cal-day{position:relative; border:1px solid var(--line); background:var(--input-bg); border-radius:10px;
-    min-height:46px; padding:6px 4px 4px; font-size:13px; font-weight:700; cursor:pointer; text-align:center; color:var(--ink)}
+    min-height:56px; padding:6px 4px 4px; font-size:13px; font-weight:700; cursor:pointer; text-align:center; color:var(--ink)}
+  .cal-day.other{color:var(--muted); opacity:.5; border-color:transparent; background:transparent; cursor:default}
   .cal-day.blank{border-color:transparent; background:transparent; cursor:default}
   .cal-day.today{border-color:var(--pink); box-shadow:0 0 0 2px rgba(236,72,153,.25)}
   .cal-day.selected{background:linear-gradient(120deg,var(--orange),var(--pink)); color:#fff; border-color:transparent}
@@ -213,27 +223,27 @@
   .last-check{font-size:11.5px; color:var(--muted); font-weight:600; white-space:nowrap}
 
   /* Settings */
-  .set-section{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:18px; margin-bottom:14px; box-shadow:var(--shadow)}
+  .set-section{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:16px; margin-bottom:14px; box-shadow:var(--shadow)}
   .set-section h3{font-size:16px; font-weight:800; margin-bottom:4px}
-  .set-section .hint{font-size:13px; color:var(--muted); line-height:1.55; margin-bottom:12px}
+  .set-section .hint{font-size:13px; color:var(--muted); line-height:1.55; margin-bottom:8px}
   .set-row{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:9px 0; border-top:1px solid var(--soft); font-size:14px; font-weight:600}
   .set-row:first-of-type{border-top:0}
   .set-row .hint-inline{font-size:12px; color:var(--muted); font-weight:500; display:block; margin-top:2px}
   .set-row input[type="checkbox"]{width:20px; height:20px; accent-color:#ec4899; flex:none; cursor:pointer}
   .set-row select{font:inherit; font-size:13px; font-weight:700; color:var(--ink); background:var(--input-bg);
     border:1.5px solid var(--line); border-radius:999px; padding:8px 12px; outline:0; cursor:pointer}
-  .set-row input[type="text"]{font:inherit; font-size:14px; color:var(--ink); background:var(--input-bg);
+  .set-row input[type="text"], .set-row input[type="number"]{font:inherit; font-size:14px; color:var(--ink); background:var(--input-bg);
     border:1.5px solid var(--line); border-radius:12px; padding:10px 12px; outline:0; width:220px; max-width:60%}
   .set-actions{display:flex; flex-wrap:wrap; gap:8px}
   .prof-row{display:grid; grid-template-columns:110px 1fr 1.4fr 34px; gap:8px; margin-bottom:8px; align-items:center}
   .prof-row input{font:inherit; font-size:13px; color:var(--ink); background:var(--input-bg);
     border:1.5px solid var(--line); border-radius:10px; padding:9px 10px; outline:0; width:100%; min-width:0}
-  .prof-row button{border:0; background:none; color:#c4a8bd; cursor:pointer; font-size:17px; padding:4px}
+  .prof-row button{border:0; background:none; color:#c4a8bd; cursor:pointer; font-size:17px; padding:0; min-width:32px; min-height:32px; display:flex; align-items:center; justify-content:center; border-radius:8px}
   .prof-row button:hover{color:var(--danger)}
   @media (max-width:640px){ .prof-row{grid-template-columns:90px 1fr 34px} .prof-row input.prof-url{grid-column:1/-1} }
 
   /* Activity log */
-  .log{margin-top:26px}
+  .log{margin-top:18px}
   .log summary{cursor:pointer; font-weight:800; font-size:15px; list-style:none}
   .log summary::-webkit-details-marker{display:none}
   .log ul{list-style:none; margin-top:10px}
@@ -242,8 +252,8 @@
   .log time{color:var(--muted); font-size:12px; display:block}
 
   /* Bottom nav */
-  .bottomnav{position:fixed; left:0; right:0; bottom:0; z-index:40;
-    background:var(--card); border-top:1px solid var(--line);
+  .bottomnav{position:fixed; left:50%; transform:translateX(-50%); width:100%; max-width:1020px; bottom:0; z-index:40;
+    background:var(--card); border-top:1px solid var(--line); border-radius:18px 18px 0 0;
     display:flex; justify-content:space-around;
     padding:8px 8px calc(8px + env(safe-area-inset-bottom)); box-shadow:0 -6px 20px -12px rgba(43,18,56,.3)}
   .bottomnav button{flex:1; border:0; background:none; cursor:pointer; font:inherit; color:var(--muted);
@@ -321,12 +331,15 @@
   .target-head b{font-size:15px; white-space:nowrap}
 
   /* Check-in heatmap */
-  .heatmap{display:grid; grid-template-rows:repeat(7,12px); grid-auto-flow:column; grid-auto-columns:12px; gap:3px; overflow-x:auto; padding-bottom:4px}
-  .hm-cell{width:12px; height:12px; border-radius:3px; background:var(--soft)}
+  .heatmap{display:grid; grid-template-rows:repeat(7,auto); grid-auto-flow:column; grid-auto-columns:1fr; gap:3px; width:100%}
+  .hm-cell{width:100%; aspect-ratio:1/1; height:auto; border-radius:3px; background:var(--soft)}
+  .hm-cell.lv0{background:#e9d6e2}
+  body.dark .hm-cell.lv0{background:#4a3049}
+  .hm-cell.future{opacity:.35}
   .hm-cell.lv1{background:#fdba74}
   .hm-cell.lv2{background:#fb923c}
   .hm-cell.lv3{background:linear-gradient(120deg,var(--orange),var(--pink))}
-  .heatmap-legend{display:flex; align-items:center; gap:5px; justify-content:flex-end; font-size:11.5px; color:var(--muted); font-weight:700; margin-top:10px}
+  .heatmap-legend{display:flex; align-items:center; gap:5px; justify-content:flex-start; font-size:11.5px; color:var(--muted); font-weight:700; margin-top:10px}
   .heatmap-legend .hm-cell{width:11px; height:11px}
 
   /* Tags & weekly */
@@ -342,7 +355,7 @@
   .conv-result{display:flex; justify-content:space-between; align-items:baseline; gap:10px; background:var(--soft2); border:1px dashed #f9a8d4; border-radius:12px; padding:14px; font-size:14px; font-weight:700; margin-bottom:12px}
   .conv-result b{font-size:22px; font-weight:800; overflow-wrap:anywhere}
 
-  footer{text-align:center; color:var(--muted); font-size:12px; margin-top:28px; line-height:1.7}
+  footer{text-align:center; color:var(--muted); font-size:12px; margin-top:20px; line-height:1.7}
   [hidden]{display:none !important}
 </style>
 </head>
@@ -404,28 +417,32 @@
 
     <h2 class="sec-title" data-i18n="urgentTitle">Urgent this week</h2>
     <section class="panel" id="urgentPanel"></section>
-    <div style="margin-top:10px; display:flex; flex-wrap:wrap; gap:8px; align-items:center">
+    <div style="margin-top:10px; display:flex; flex-wrap:wrap; gap:4px 10px; align-items:center">
       <button class="btn btn-ghost btn-sm" id="notifyBtn" data-i18n="enableReminders">Enable browser reminders</button>
+      <span class="urgent-note" style="margin-top:0" data-i18n="remindersNote">Reminders appear when you open this page.</span>
     </div>
-    <p class="urgent-note" data-i18n="remindersNote">Reminders appear when you open this page.</p>
 
     <h2 class="sec-title"><span data-i18n="todayTitle">Today's tasks</span> <small id="todayDate"></small></h2>
     <section class="panel" id="todayPanel"></section>
 
     <div class="toolbar">
-      <div class="search"><span class="search-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#b39aad" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></span><input id="searchInput" type="search" placeholder="Search airdrops, tasks, notes..." data-i18n-ph="searchPh" aria-label="Search airdrops"></div>
-      <button class="btn btn-primary" id="addBtn" data-i18n="addAirdrop">+ Add Airdrop</button>
-      <select class="select" id="templateSelect" aria-label="Add from template">
-        <option value="" data-i18n="templatePh">Add from template…</option>
-        <option value="testnet" data-i18n="tplTestnet">Testnet</option>
-        <option value="points" data-i18n="tplPoints">Points / Quest</option>
-        <option value="whitelist" data-i18n="tplWhitelist">Whitelist</option>
-        <option value="daily" data-i18n="tplDaily">Daily Check-in</option>
-      </select>
-      <button class="btn btn-ghost" id="exportBtn" title="Download a JSON backup" data-i18n="exportBtn">Export</button>
-      <button class="btn btn-ghost" id="importBtn" title="Restore from a JSON file" data-i18n="importBtn">Import</button>
-      <button class="btn btn-ghost" id="refreshPricesBtn" title="Fetch live token prices" data-i18n="refreshPrices">Refresh prices</button>
-      <button class="btn btn-ghost" id="importLinkBtn" data-i18n="importLink">Import from link</button>
+      <div class="toolbar-row">
+        <div class="search"><span class="search-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#b39aad" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></span><input id="searchInput" type="search" placeholder="Search airdrops, tasks, notes..." data-i18n-ph="searchPh" aria-label="Search airdrops"></div>
+        <button class="btn btn-primary" id="addBtn" data-i18n="addAirdrop">+ Add Airdrop</button>
+      </div>
+      <div class="toolbar-row">
+        <select class="select" id="templateSelect" aria-label="Add from template">
+          <option value="" data-i18n="templatePh">Add from template…</option>
+          <option value="testnet" data-i18n="tplTestnet">Testnet</option>
+          <option value="points" data-i18n="tplPoints">Points / Quest</option>
+          <option value="whitelist" data-i18n="tplWhitelist">Whitelist</option>
+          <option value="daily" data-i18n="tplDaily">Daily Check-in</option>
+        </select>
+        <button class="btn btn-ghost" id="exportBtn" title="Download a JSON backup" data-i18n="exportBtn">Export</button>
+        <button class="btn btn-ghost" id="importBtn" title="Restore from a JSON file" data-i18n="importBtn">Import</button>
+        <button class="btn btn-ghost" id="importLinkBtn" data-i18n="importLink">Import from link</button>
+        <button class="btn btn-ghost" id="refreshPricesBtn" title="Fetch live token prices" data-i18n="refreshPrices">Refresh prices</button>
+      </div>
       <input type="file" id="importFile" accept="application/json,.json" hidden>
     </div>
     <div class="filters">
@@ -490,6 +507,24 @@
   <!-- ============ TASKS VIEW ============ -->
   <section id="view-tasks" hidden>
     <h2 class="sec-title" data-i18n="tasksTitle">All tasks</h2>
+    <div class="task-group" id="tasksQuickAdd">
+      <div class="add-task">
+        <select id="tasksPick" aria-label="Choose airdrop"></select>
+        <input type="text" id="tasksQuickInput" data-i18n-ph="tasksAddPh" placeholder="Task name...">
+        <select id="tasksQuickRepeat" aria-label="Repeat">
+          <option value="once" data-i18n="repeatOnce">Once</option>
+          <option value="daily" data-i18n="repeatDaily">Daily</option>
+          <option value="weekly" data-i18n="repeatWeekly">Weekly</option>
+        </select>
+        <button id="tasksQuickBtn" data-i18n="tasksAddBtn">+ Add task</button>
+      </div>
+      <div class="chips" id="tasksFilterChips" style="margin-top:10px">
+        <button class="chip active" data-tfilter="all" data-i18n="chipAll">All</button>
+        <button class="chip" data-tfilter="daily" data-i18n="dailyTag">DAILY</button>
+        <button class="chip" data-tfilter="weekly" data-i18n="weeklyTag">WEEKLY</button>
+      </div>
+      <p class="urgent-note" id="tasksQuickHint" hidden data-i18n="tasksNoAirdrop">Add an airdrop first to add tasks here.</p>
+    </div>
     <div id="tasksView"></div>
     <div class="empty" id="tasksEmpty" hidden>
       <div class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="#e9c6de" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
@@ -515,7 +550,7 @@
         <button class="btn btn-ghost btn-sm" data-conv-amt="1000">1000</button>
       </div>
       <div class="conv-result"><span data-i18n="convResult">Result</span><b id="convResult">Rp0</b></div>
-      <div class="set-row"><span data-i18n="convRate">Exchange rate (1 USD =)</span><input type="number" id="convRateInput" min="0" step="any" style="width:170px"></div>
+      <div class="set-row"><span data-i18n="convRate">Exchange rate (1 USD =)</span><input type="number" id="convRateInput" min="0" step="any"></div>
       <p class="urgent-note" id="convUpdated"></p>
       <div class="set-actions" style="margin-top:12px">
         <button class="btn btn-ghost btn-sm" id="convSwapBtn" data-i18n="convSwap">Swap direction</button>
@@ -539,7 +574,7 @@
     <div class="set-section">
       <h3 data-i18n="monthlyTargetTitle">Monthly target</h3>
       <p class="hint" data-i18n="targetHint">How many points do you want to earn this month? Progress shows on Home.</p>
-      <div class="set-row"><span data-i18n="monthlyTargetLabel">Monthly points target</span><input type="number" id="setTarget" min="0" step="1" style="width:120px"></div>
+      <div class="set-row"><span data-i18n="monthlyTargetLabel">Monthly points target</span><input type="number" id="setTarget" min="0" step="1"></div>
     </div>
 
     <div class="set-section">
@@ -890,6 +925,7 @@
   var log = loadLog();
   var filter = "all";
   var tagFilter = "";
+  var tasksFilter = "all";
   var catFilter = "all";
   var walletFilter = "all";
   var sortBy = "updated";
@@ -1015,6 +1051,8 @@
       noDeadlinesDay: "No deadlines on this day.",
       tasksTitle: "All tasks", noTasksTitle: "No tasks yet",
       noTasksText: "Add tasks to your airdrops and they will show up here, grouped by airdrop.",
+      tasksAddBtn: "+ Add task", tasksPickAirdrop: "Choose airdrop",
+      tasksAddPh: "Task name...", tasksNoAirdrop: "Add an airdrop first to add tasks here.",
       settingsTitle: "Settings", setProfile: "My Profile",
       setProfileHint: "Your display name is shown on your profile card.",
       displayName: "Display name", language: "Language", languageLabel: "Language / Bahasa",
@@ -1151,6 +1189,8 @@
       noDeadlinesDay: "Tidak ada deadline di hari ini.",
       tasksTitle: "Semua tugas", noTasksTitle: "Belum ada tugas",
       noTasksText: "Tambahkan tugas ke airdropmu dan tugas itu akan muncul di sini, dikelompokkan per airdrop.",
+      tasksAddBtn: "+ Tambah tugas", tasksPickAirdrop: "Pilih airdrop",
+      tasksAddPh: "Nama tugas...", tasksNoAirdrop: "Tambah airdrop dulu untuk menambah tugas di sini.",
       settingsTitle: "Pengaturan", setProfile: "Profil Saya",
       setProfileHint: "Nama tampilanmu ditampilkan di kartu profil.",
       displayName: "Nama tampilan", language: "Bahasa", languageLabel: "Language / Bahasa",
@@ -1455,7 +1495,7 @@
     var end = new Date();
     end = new Date(end.getFullYear(), end.getMonth(), end.getDate());
     var start = new Date(end);
-    start.setDate(start.getDate() - 111);
+    start.setDate(start.getDate() - 181);
     var firstDow = (start.getDay() + 6) % 7;
     start.setDate(start.getDate() - firstDow);
     var cells = [];
@@ -1468,6 +1508,7 @@
       cells.push('<span class="hm-cell lv' + lv + '" title="' + esc(label) + '"></span>');
       cur.setDate(cur.getDate() + 1);
     }
+    while(cells.length % 7 !== 0) cells.push('<span class="hm-cell future"></span>');
     document.getElementById("heatmapGrid").innerHTML = cells.join("");
   }
   function renderStats(){
@@ -1874,7 +1915,8 @@
     var html = "";
     var DOW = settings.lang === "id" ? ["Sen","Sel","Rab","Kam","Jum","Sab","Min"] : ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
     DOW.forEach(function(d){ html += '<div class="cal-dow">' + d + '</div>'; });
-    for(var i = 0; i < startDay; i++) html += '<div class="cal-day blank"></div>';
+    var prevDays = new Date(y, m, 0).getDate();
+    for(var i = 0; i < startDay; i++) html += '<div class="cal-day other">' + (prevDays - startDay + 1 + i) + '</div>';
     for(var d = 1; d <= daysInMonth; d++){
       var ds = y + "-" + (m + 1 < 10 ? "0" + (m + 1) : (m + 1)) + "-" + (d < 10 ? "0" + d : d);
       var n = map[ds] ? map[ds].length : 0;
@@ -1882,6 +1924,8 @@
         '" data-cal-day="' + ds + '">' + d +
         (n ? '<span class="dot"></span><span class="cnt">' + deadlineCount(n) + '</span>' : "") + '</div>';
     }
+    var trail = (7 - ((startDay + daysInMonth) % 7)) % 7;
+    for(var j = 1; j <= trail; j++) html += '<div class="cal-day other">' + j + '</div>';
     document.getElementById("calGrid").innerHTML = html;
     var list = map[calSelected] || [];
     document.getElementById("calDayTitle").textContent = t("calDeadlines") + " — " + fmtDate(calSelected);
@@ -1900,6 +1944,25 @@
   function renderTasksView(){
     var box = document.getElementById("tasksView");
     var wk = weekKey();
+    var pick = document.getElementById("tasksPick");
+    var opts = items.filter(function(it){ return !it.archived; });
+    var curPick = pick.value;
+    pick.innerHTML = "";
+    if(opts.length === 0){
+      var o0 = document.createElement("option"); o0.value = ""; o0.textContent = t("tasksPickAirdrop"); pick.appendChild(o0);
+      document.getElementById("tasksQuickBtn").disabled = true;
+      document.getElementById("tasksQuickHint").hidden = false;
+    } else {
+      opts.forEach(function(it){ var o = document.createElement("option"); o.value = it.id; o.textContent = it.name; pick.appendChild(o); });
+      if(opts.some(function(it){ return it.id === curPick; })) pick.value = curPick;
+      document.getElementById("tasksQuickBtn").disabled = false;
+      document.getElementById("tasksQuickHint").hidden = true;
+    }
+    var visible = function(t){
+      if(tasksFilter === "daily") return !!t.daily;
+      if(tasksFilter === "weekly") return !!(t.weekly || t.repeat === "weekly");
+      return true;
+    };
     var weeklyRows = [];
     items.forEach(function(it){
       if(it.archived) return;
@@ -1908,7 +1971,7 @@
       });
     });
     var html = "";
-    if(weeklyRows.length){
+    if(weeklyRows.length && tasksFilter !== "daily"){
       html += '<div class="task-group"><h3>' + esc(t("thisWeek")) + '</h3><div class="tasks">';
       weeklyRows.forEach(function(r){
         var checked = (r.t.lastDoneWeek || "") === wk;
@@ -1926,10 +1989,12 @@
     groups.sort(function(a, b){ return (b.updatedAt || 0) - (a.updatedAt || 0); });
     document.getElementById("tasksEmpty").hidden = groups.length !== 0;
     groups.forEach(function(it){
+      var visTasks = (it.tasks || []).filter(visible);
+      if(!visTasks.length) return;
       html += '<div class="task-group"><h3>' + esc(it.name) +
         (it.link ? '<a href="' + esc(it.link) + '" target="_blank" rel="noopener">' + esc(t("openWord")) + '</a>' : "") + '</h3>';
       html += '<div class="tasks">';
-      it.tasks.forEach(function(t){
+      visTasks.forEach(function(t){
         var checked = taskChecked(t);
         var st = t.daily ? streakOf(t) : 0;
         var lc = t.daily ? lastCheckin(t) : "";
@@ -1946,8 +2011,29 @@
       });
       html += addTaskRowHtml(it, t("addTaskPh")) + '</div></div>';
     });
+    document.querySelectorAll("#tasksFilterChips .chip").forEach(function(c){
+      c.classList.toggle("active", c.getAttribute("data-tfilter") === tasksFilter);
+    });
     box.innerHTML = html;
   }
+  document.getElementById("tasksQuickBtn").addEventListener("click", function(){
+    var id = document.getElementById("tasksPick").value;
+    var inp = document.getElementById("tasksQuickInput");
+    var rep = document.getElementById("tasksQuickRepeat").value;
+    var text = (inp.value || "").trim();
+    if(!id || !text) return;
+    addTask(id, text, rep);
+    inp.value = "";
+  });
+  document.getElementById("tasksQuickInput").addEventListener("keydown", function(e){
+    if(e.key === "Enter"){ e.preventDefault(); document.getElementById("tasksQuickBtn").click(); }
+  });
+  document.getElementById("tasksFilterChips").addEventListener("click", function(e){
+    var b = e.target.closest("[data-tfilter]");
+    if(!b) return;
+    tasksFilter = b.getAttribute("data-tfilter");
+    renderTasksView();
+  });
 
   /* ---------- item / task ops ---------- */
   function recordPoints(it, newPoints){
