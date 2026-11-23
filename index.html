@@ -1357,16 +1357,46 @@
       tasks: Array.isArray(it.tasks) ? it.tasks.map(normalizeTask) : [],
       createdAt: it.createdAt || Date.now(), updatedAt: it.updatedAt || Date.now() };
   }
+  var SEED_FLAG = "airdrop-tracker-seeded-v1";
+  function seedItems(){
+    return [
+      {name:"Dow Protocol", link:"", status:"running", category:"Points", chain:"BNB Chain", wallet:"0xAe5f920b5d5Ce0f941b2b1A941eb058Cac3E5624", points:0, cost:0, value:0, effort:"light", reward:"", source:"Dow Protocol", deadline:"", next:"Check-in harian (transaksi BNB)", notes:"Check-in harian = transaksi on-chain BNB (~0.0001 BNB). Saldo BNB wallet utama sudah menipis (~0.000065 BNB, 23 Nov) - check-in kemungkinan tidak jalan. Menunggu jawaban soal rute top-up BNB 16 Nov.", token:"", expectedTokens:0, tags:["check-in","harian"], color:"orange", tasks:[{text:"Check-in harian", repeat:"daily", dates:[]}]},
+      {name:"vAPI Network Earn", link:"", status:"running", category:"Points", chain:"Base", wallet:"0xAe5f920b5d5Ce0f941b2b1A941eb058Cac3E5624", points:2020, cost:0, value:0, effort:"medium", reward:"", source:"vAPI", deadline:"", next:"Jalankan 'vapi setup' di terminal sendiri (menampilkan recovery phrase)", notes:"2.020 poin, rank 6.636/124.209, 13/19 quest. 'Connect an agent' (+250 poin) tertunda - vapi setup harus jalan di terminal dia sendiri. Follow LinkedIn masih direview.", token:"", expectedTokens:0, tags:["points","quest"], color:"blue", tasks:[{text:"Connect an agent (+250 poin)", repeat:"once", dates:[]},{text:"Follow LinkedIn", repeat:"once", dates:[]}]},
+      {name:"Aura Protocol", link:"", status:"running", category:"Testnet", chain:"", wallet:"", points:11730, cost:0, value:0, effort:"light", reward:"", source:"Aura", deadline:"", next:"Join Telegram + Discord", notes:"11.730 poin (batas 10.000 sudah lewat). Sisa: join Telegram dan Discord.", token:"", expectedTokens:0, tags:["testnet","points"], color:"purple", tasks:[{text:"Join Telegram", repeat:"once", dates:[]},{text:"Join Discord", repeat:"once", dates:[]}]},
+      {name:"Dividends Arts", link:"https://dividendsarts.xyz/apply?ref=yotweykd", status:"running", category:"Whitelist", chain:"Pharos", wallet:"0xe28A4a83e2726b35A8e03a7fd2FaC2dA418AFC3E", points:10, cost:0, value:0, effort:"light", reward:"", source:"dividendsarts.xyz", deadline:"", next:"Selesaikan tugas X (like, quote, comment, follow @dividendsarts)", notes:"Whitelist diajukan dengan hunting wallet + @xenon_d62. Supply 1.000 (500 gratis / 500 berbayar). Tugas X tertunda - login X sempat dibatasi, jangan coba login ulang dulu. Phase 1 free mint dibuka 19 Nov, tapi kontrak tidak ada fungsi refund padahal dijanjikan refund biaya mint - hati-hati kalau mint.", token:"", expectedTokens:0, tags:["whitelist","nft"], color:"pink", tasks:[{text:"Like, quote, comment, follow @dividendsarts di X", repeat:"once", dates:[]}]},
+      {name:"Null", link:"", status:"running", category:"Whitelist", chain:"", wallet:"", points:0, cost:0, value:0, effort:"light", reward:"", source:"Null", deadline:"2026-11-26", next:"Klik 'Confirm my email' di email 19 Nov (rzxann@gmail.com)", notes:"Email konfirmasi 19 Nov di rzxann@gmail.com, link kedaluwarsa sekitar 26 Nov 2026.", token:"", expectedTokens:0, tags:["whitelist"], color:"amber", tasks:[{text:"Klik Confirm my email (sebelum 26 Nov)", repeat:"once", dates:[]}]},
+      {name:"SHIT Capital", link:"", status:"waiting", category:"Whitelist", chain:"", wallet:"", points:188, cost:0, value:0, effort:"light", reward:"", source:"SHIT Capital", deadline:"", next:"Cek 'View ID card' di HP", notes:"188/1.000 Genesis Spots. Status whitelist perlu hasil 'View ID card' dari HP.", token:"", expectedTokens:0, tags:["whitelist"], color:"green", tasks:[{text:"Cek View ID card di HP", repeat:"once", dates:[]}]},
+      {name:"BenDaDonnn x Puffco (Content Rewards)", link:"https://contentrewards.com/c/campaigns/bb66f9eb-b90e-4dd0-8cee-9f3cd566c9a0", status:"running", category:"Other", chain:"", wallet:"Whop", points:0, cost:0, value:0, effort:"medium", reward:"$1 / 1K views", source:"Content Rewards", deadline:"", next:"Join campaign (brief masih terkunci sampai join)", notes:"Rp17 ribu per 1.000 views, min Rp34 ribu, maks Rp6,7 juta per klip. Semua platform dibayar termasuk Facebook + X. Budget Rp169 juta, sisa Rp167 juta (22 Nov). Clip01 (45 detik, Puffco dab) sudah diposting ke TikTok 22 Nov. Hanya footage BenDaDonnn yang lolos.", token:"", expectedTokens:0, tags:["content-rewards","gta6","tiktok"], color:"orange", tasks:[{text:"Join campaign di Content Rewards", repeat:"once", dates:[]},{text:"Kirim link TikTok clip01 ke Content Rewards", repeat:"once", dates:[]}]},
+      {name:"Dasgasd3m x RUCKUS (Content Rewards)", link:"", status:"running", category:"Other", chain:"", wallet:"Whop", points:0, cost:0, value:0, effort:"medium", reward:"$2 / 1K views", source:"Content Rewards", deadline:"2026-12-19", next:"Posting 2 klip ke TikTok, lalu submit link ke Content Rewards (maks 30 menit setelah posting)", notes:"Rp34 ribu per 1.000 views, min Rp340 ribu (10.000 views per klip), maks Rp2,5 juta per klip (cap 75 ribu views). Budget sisa Rp15,5 juta dari Rp17 juta. TikTok + YouTube Shorts saja, global. Hashtag #dasgasdom3, caption harus ada kata 'Sponsored'. 2 klip sudah jadi (gas price 48 detik, scooter 54 detik).", token:"", expectedTokens:0, tags:["content-rewards","gta6","tiktok"], color:"pink", tasks:[{text:"Post klip gas-price ke TikTok", repeat:"once", dates:[]},{text:"Post klip scooter ke TikTok", repeat:"once", dates:[]},{text:"Submit link ke Content Rewards (maks 30 menit setelah posting)", repeat:"once", dates:[]}]},
+      {name:"ClipUp Official GTA VI", link:"", status:"running", category:"Other", chain:"", wallet:"Whop", points:0, cost:0, value:0, effort:"medium", reward:"$0.30 / 1K views", source:"Content Rewards", deadline:"", next:"Clip GTA VI streamer + tambah logo ClipUp hanya kalau dibilang", notes:"Rp5 ribu per 1.000 views, min Rp15 ribu, maks Rp2,5 juta per klip. HANYA views negara tier-1 (US/UK/Kanada/Australia) yang dibayar - views Indonesia = Rp0. Facebook BUKAN platform berbayar (IG/TikTok/YouTube saja). Hashtag #gta6 + #Clipup. Logo ClipUp HANYA kalau dia bilang.", token:"", expectedTokens:0, tags:["content-rewards","gta6"], color:"blue", tasks:[{text:"Clip GTA VI streamer untuk IG @xann_rz", repeat:"once", dates:[]}]}
+    ];
+  }
   function loadItems(){
+    var list = [];
+    var migrated = false;
     try {
       var raw = localStorage.getItem(KEY);
-      if(raw){ var arr = JSON.parse(raw); if(Array.isArray(arr)) return arr.map(normalizeItem); }
-      var raw2 = localStorage.getItem(KEY2);
-      if(raw2){ var arr2 = JSON.parse(raw2); if(Array.isArray(arr2)){ var m = arr2.map(normalizeItem); saveItems(m); return m; } }
-      var raw1 = localStorage.getItem(KEY1);
-      if(raw1){ var arr1 = JSON.parse(raw1); if(Array.isArray(arr1)){ var m1 = arr1.map(normalizeItem); saveItems(m1); return m1; } }
+      if(raw){ var arr = JSON.parse(raw); if(Array.isArray(arr)) list = arr.map(normalizeItem); }
+      if(!list.length){
+        var raw2 = localStorage.getItem(KEY2);
+        if(raw2){ var arr2 = JSON.parse(raw2); if(Array.isArray(arr2)){ list = arr2.map(normalizeItem); migrated = true; } }
+      }
+      if(!list.length){
+        var raw1 = localStorage.getItem(KEY1);
+        if(raw1){ var arr1 = JSON.parse(raw1); if(Array.isArray(arr1)){ list = arr1.map(normalizeItem); migrated = true; } }
+      }
     } catch(e){}
-    return [];
+    if(migrated && list.length){ try { saveItems(list); } catch(e){} }
+    if(!list.length){
+      try {
+        if(!localStorage.getItem(SEED_FLAG)){
+          list = seedItems().map(normalizeItem);
+          saveItems(list);
+          localStorage.setItem(SEED_FLAG, "1");
+        }
+      } catch(e){}
+    }
+    return list;
   }
   function saveItems(list){
     try { localStorage.setItem(KEY, JSON.stringify(list)); return true; }
