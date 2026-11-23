@@ -285,6 +285,29 @@
   .lightbox-img{width:100%; border-radius:14px; display:block; margin-bottom:14px}
   .sync-textarea{width:100%; min-height:140px; font:inherit; font-size:12.5px; border:1.5px solid var(--line);
     border-radius:12px; padding:11px 13px; outline:0; background:var(--input-bg); color:var(--ink); resize:vertical; word-break:break-all}
+
+  /* Statistics charts */
+  .chart-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+  @media (max-width:640px){ .chart-grid{grid-template-columns:1fr} }
+  .chart-box h3{font-size:14px; font-weight:800; margin-bottom:8px}
+  .chart-box canvas{width:100%; height:180px; display:block}
+  .chart-empty{color:var(--muted); font-size:13px; line-height:1.55}
+  .price-note{font-size:11.5px; color:var(--muted); font-weight:600}
+
+  /* PIN lock */
+  .lock-screen{position:fixed; inset:0; z-index:100; background:var(--bg); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; padding:24px}
+  .lock-screen h2{font-size:20px; font-weight:800}
+  .lock-avatar{width:72px; height:72px; border-radius:50%; background:linear-gradient(135deg,#f97316,#ec4899,#8b5cf6); color:#fff; display:flex; align-items:center; justify-content:center; font-size:30px; font-weight:800}
+  .pin-dots{display:flex; gap:12px}
+  .pin-dot{width:16px; height:16px; border-radius:50%; border:2px solid var(--line); background:var(--card)}
+  .pin-dot.filled{background:var(--pink); border-color:var(--pink)}
+  .pin-pad{display:grid; grid-template-columns:repeat(3,72px); gap:10px}
+  .pin-key{height:56px; border-radius:14px; border:1.5px solid var(--line); background:var(--card); color:var(--ink); font:inherit; font-size:20px; font-weight:700; cursor:pointer}
+  .pin-key:active{transform:scale(.96)}
+  .pin-err{color:var(--danger); font-size:13px; font-weight:700; min-height:18px}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+  .shake{animation:shake .35s ease}
+
   footer{text-align:center; color:var(--muted); font-size:12px; margin-top:28px; line-height:1.7}
   [hidden]{display:none !important}
 </style>
@@ -296,16 +319,32 @@
   <section id="view-home">
     <header class="hero">
       <h1>Aksara Airdrop Tracker</h1>
-      <p>Every airdrop you're working on, in one place. Work through your daily checklist, watch your deadlines, and track your points.</p>
+      <p data-i18n="heroSub">Every airdrop you're working on, in one place. Work through your daily checklist, watch your deadlines, and track your points.</p>
       <div class="stats">
-        <div class="stat"><b id="totalPoints">0</b><span>TOTAL POINTS</span></div>
-        <div class="stat"><b id="todayDone">0/0</b><span>TODAY'S TASKS</span></div>
-        <div class="stat"><b id="countRunning">0</b><span>ACTIVE AIRDROPS</span></div>
-        <div class="stat"><b id="totalCost">Rp0</b><span>TOTAL COST</span></div>
-        <div class="stat"><b id="totalValue">Rp0</b><span>ESTIMATED VALUE</span></div>
-        <div class="stat"><b id="totalProfit">Rp0</b><span>POTENTIAL PROFIT</span></div>
+        <div class="stat"><b id="totalPoints">0</b><span data-i18n="statPoints">TOTAL POINTS</span></div>
+        <div class="stat"><b id="todayDone">0/0</b><span data-i18n="statTasks">TODAY'S TASKS</span></div>
+        <div class="stat"><b id="countRunning">0</b><span data-i18n="statActive">ACTIVE AIRDROPS</span></div>
+        <div class="stat"><b id="totalCost">Rp0</b><span data-i18n="statCost">TOTAL COST</span></div>
+        <div class="stat"><b id="totalValue">Rp0</b><span data-i18n="statValue">ESTIMATED VALUE</span></div>
+        <div class="stat"><b id="totalProfit">Rp0</b><span data-i18n="statProfit">POTENTIAL PROFIT</span></div>
       </div>
     </header>
+
+    <h2 class="sec-title" data-i18n="statsTitle">Statistics</h2>
+    <section class="panel" id="statsPanel">
+      <div class="chart-grid">
+        <div class="chart-box">
+          <h3 data-i18n="pointsOverTime">Points over time</h3>
+          <canvas id="pointsChart" width="600" height="360"></canvas>
+          <p class="chart-empty" id="pointsChartEmpty" hidden data-i18n="noChartData">No data yet — charts will appear as you log points.</p>
+        </div>
+        <div class="chart-box">
+          <h3 data-i18n="costVsValue">Cost vs estimated value by category</h3>
+          <canvas id="catChart" width="600" height="360"></canvas>
+          <p class="chart-empty" id="catChartEmpty" hidden data-i18n="noCatData">Add a cost or estimated value to see this chart.</p>
+        </div>
+      </div>
+    </section>
 
     <section class="profile" id="profileCard">
       <div class="avatar" id="profileAvatar">X</div>
@@ -315,74 +354,75 @@
       </div>
     </section>
 
-    <h2 class="sec-title">Urgent this week</h2>
+    <h2 class="sec-title" data-i18n="urgentTitle">Urgent this week</h2>
     <section class="panel" id="urgentPanel"></section>
     <div style="margin-top:10px; display:flex; flex-wrap:wrap; gap:8px; align-items:center">
-      <button class="btn btn-ghost btn-sm" id="notifyBtn">Enable browser reminders</button>
+      <button class="btn btn-ghost btn-sm" id="notifyBtn" data-i18n="enableReminders">Enable browser reminders</button>
     </div>
-    <p class="urgent-note">Reminders appear when you open this page.</p>
+    <p class="urgent-note" data-i18n="remindersNote">Reminders appear when you open this page.</p>
 
-    <h2 class="sec-title">Today's tasks <small id="todayDate"></small></h2>
+    <h2 class="sec-title"><span data-i18n="todayTitle">Today's tasks</span> <small id="todayDate"></small></h2>
     <section class="panel" id="todayPanel"></section>
 
     <div class="toolbar">
-      <div class="search"><span>🔍</span><input id="searchInput" type="search" placeholder="Search airdrops, tasks, notes..." aria-label="Search airdrops"></div>
-      <button class="btn btn-primary" id="addBtn">+ Add Airdrop</button>
+      <div class="search"><span>🔍</span><input id="searchInput" type="search" placeholder="Search airdrops, tasks, notes..." data-i18n-ph="searchPh" aria-label="Search airdrops"></div>
+      <button class="btn btn-primary" id="addBtn" data-i18n="addAirdrop">+ Add Airdrop</button>
       <select class="select" id="templateSelect" aria-label="Add from template">
-        <option value="">Add from template…</option>
-        <option value="testnet">Testnet</option>
-        <option value="points">Points / Quest</option>
-        <option value="whitelist">Whitelist</option>
-        <option value="daily">Daily Check-in</option>
+        <option value="" data-i18n="templatePh">Add from template…</option>
+        <option value="testnet" data-i18n="tplTestnet">Testnet</option>
+        <option value="points" data-i18n="tplPoints">Points / Quest</option>
+        <option value="whitelist" data-i18n="tplWhitelist">Whitelist</option>
+        <option value="daily" data-i18n="tplDaily">Daily Check-in</option>
       </select>
-      <button class="btn btn-ghost" id="exportBtn" title="Download a JSON backup">Export</button>
-      <button class="btn btn-ghost" id="importBtn" title="Restore from a JSON file">Import</button>
+      <button class="btn btn-ghost" id="exportBtn" title="Download a JSON backup" data-i18n="exportBtn">Export</button>
+      <button class="btn btn-ghost" id="importBtn" title="Restore from a JSON file" data-i18n="importBtn">Import</button>
+      <button class="btn btn-ghost" id="refreshPricesBtn" title="Fetch live token prices" data-i18n="refreshPrices">Refresh prices</button>
       <input type="file" id="importFile" accept="application/json,.json" hidden>
     </div>
     <div class="filters">
       <div class="chips" id="filterChips">
-        <button class="chip active" data-filter="all">All</button>
-        <button class="chip" data-filter="running">Running</button>
-        <button class="chip" data-filter="waiting">Waiting</button>
-        <button class="chip" data-filter="done">Done</button>
-        <button class="chip" data-filter="archived">Archived</button>
+        <button class="chip active" data-filter="all" data-i18n="chipAll">All</button>
+        <button class="chip" data-filter="running" data-i18n="chipRunning">Running</button>
+        <button class="chip" data-filter="waiting" data-i18n="chipWaiting">Waiting</button>
+        <button class="chip" data-filter="done" data-i18n="chipDone">Done</button>
+        <button class="chip" data-filter="archived" data-i18n="chipArchived">Archived</button>
       </div>
       <select class="select" id="catFilter" aria-label="Filter by category">
-        <option value="all">All categories</option>
+        <option value="all" data-i18n="allCats">All categories</option>
       </select>
       <select class="select" id="walletFilter" aria-label="Filter by wallet">
-        <option value="all">All wallets</option>
+        <option value="all" data-i18n="allWallets">All wallets</option>
       </select>
       <select class="select" id="sortSelect" aria-label="Sort">
-        <option value="updated">Recently updated</option>
-        <option value="deadline">Nearest deadline</option>
-        <option value="points">Highest points</option>
-        <option value="priority">Highest priority</option>
-        <option value="name">Name A–Z</option>
+        <option value="updated" data-i18n="sortUpdated">Recently updated</option>
+        <option value="deadline" data-i18n="sortDeadline">Nearest deadline</option>
+        <option value="points" data-i18n="sortPoints">Highest points</option>
+        <option value="priority" data-i18n="sortPriority">Highest priority</option>
+        <option value="name" data-i18n="sortName">Name A–Z</option>
       </select>
     </div>
 
     <main class="grid" id="grid"></main>
     <div class="empty" id="emptyState" hidden>
       <div class="glyph">🪂</div>
-      <h2>No airdrops yet</h2>
-      <p>Your tracker is empty. Add your first airdrop — fill in the name, category, and task checklist, so every step is tracked until it pays off.</p>
-      <button class="btn btn-primary" id="emptyAddBtn">+ Add Airdrop</button>
+      <h2 data-i18n="emptyTitle">No airdrops yet</h2>
+      <p data-i18n="emptyText">Your tracker is empty. Add your first airdrop — fill in the name, category, and task checklist, so every step is tracked until it pays off.</p>
+      <button class="btn btn-primary" id="emptyAddBtn" data-i18n="addAirdrop">+ Add Airdrop</button>
     </div>
 
     <details class="log" id="logBox">
-      <summary>Activity log</summary>
+      <summary data-i18n="logTitle">Activity log</summary>
       <ul id="logList"></ul>
     </details>
 
-    <footer>Your data is stored in this browser. Export a backup regularly.<br>
-    Sync between devices: copy the sync code on one device and paste it on another — automatic sync needs an account and is not available in this version.<br>
-    Add to home screen from your browser menu to open it like an app.</footer>
+    <footer><span data-i18n="footer1">Your data is stored in this browser. Export a backup regularly.</span><br>
+    <span data-i18n="footer2">Sync between devices: copy the sync code on one device and paste it on another — automatic sync needs an account and is not available in this version.</span><br>
+    <span data-i18n="footer3">Add to home screen from your browser menu to open it like an app.</span></footer>
   </section>
 
   <!-- ============ CALENDAR VIEW ============ -->
   <section id="view-calendar" hidden>
-    <h2 class="sec-title">Calendar</h2>
+    <h2 class="sec-title" data-i18n="calTitle">Calendar</h2>
     <section class="panel" id="calBox">
       <div class="cal-head">
         <button class="cal-nav" id="calPrev" aria-label="Previous month">‹</button>
@@ -393,191 +433,218 @@
     </section>
     <h2 class="sec-title" id="calDayTitle">Deadlines</h2>
     <section class="panel" id="calDayList"></section>
-    <p class="urgent-note" id="calHiddenNote" hidden>Calendar is hidden. Turn it on in Settings → Sections.</p>
+    <p class="urgent-note" id="calHiddenNote" hidden data-i18n="calHidden">Calendar is hidden. Turn it on in Settings → Sections.</p>
   </section>
 
   <!-- ============ TASKS VIEW ============ -->
   <section id="view-tasks" hidden>
-    <h2 class="sec-title">All tasks</h2>
+    <h2 class="sec-title" data-i18n="tasksTitle">All tasks</h2>
     <div id="tasksView"></div>
     <div class="empty" id="tasksEmpty" hidden>
       <div class="glyph">✅</div>
-      <h2>No tasks yet</h2>
-      <p>Add tasks to your airdrops and they will show up here, grouped by airdrop.</p>
+      <h2 data-i18n="noTasksTitle">No tasks yet</h2>
+      <p data-i18n="noTasksText">Add tasks to your airdrops and they will show up here, grouped by airdrop.</p>
     </div>
   </section>
 
   <!-- ============ SETTINGS VIEW ============ -->
   <section id="view-settings" hidden>
-    <h2 class="sec-title">Settings</h2>
+    <h2 class="sec-title" data-i18n="settingsTitle">Settings</h2>
 
     <div class="set-section">
-      <h3>My Profile</h3>
-      <p class="hint">Your display name is shown on your profile card.</p>
-      <div class="set-row"><span>Display name</span><input type="text" id="setName" maxlength="30"></div>
+      <h3 data-i18n="setProfile">My Profile</h3>
+      <p class="hint" data-i18n="setProfileHint">Your display name is shown on your profile card.</p>
+      <div class="set-row"><span data-i18n="displayName">Display name</span><input type="text" id="setName" maxlength="30"></div>
     </div>
 
     <div class="set-section">
-      <h3>Appearance</h3>
-      <div class="set-row"><span>Theme</span>
+      <h3 data-i18n="language">Language</h3>
+      <div class="set-row"><span data-i18n="languageLabel">Language / Bahasa</span>
+        <select id="setLang">
+          <option value="en">English</option>
+          <option value="id">Bahasa Indonesia</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="set-section">
+      <h3 data-i18n="appLock">App lock (PIN)</h3>
+      <p class="hint" data-i18n="pinHint">Protect this app with a 4-digit PIN. The PIN only protects the app on this device — it is stored locally and is not high security.</p>
+      <div id="pinSection"></div>
+    </div>
+
+    <div class="set-section">
+      <h3 data-i18n="appearance">Appearance</h3>
+      <div class="set-row"><span data-i18n="theme">Theme</span>
         <select id="setTheme">
-          <option value="auto">Automatic</option>
-          <option value="light">Light</option>
-          <option value="dark">Dark</option>
+          <option value="auto" data-i18n="themeAuto">Automatic</option>
+          <option value="light" data-i18n="themeLight">Light</option>
+          <option value="dark" data-i18n="themeDark">Dark</option>
         </select>
       </div>
-      <div class="set-row"><span>Card density</span>
+      <div class="set-row"><span data-i18n="density">Card density</span>
         <select id="setDensity">
-          <option value="comfortable">Comfortable</option>
-          <option value="compact">Compact</option>
+          <option value="comfortable" data-i18n="densityComfortable">Comfortable</option>
+          <option value="compact" data-i18n="densityCompact">Compact</option>
         </select>
       </div>
     </div>
 
     <div class="set-section">
-      <h3>Reminders</h3>
-      <div class="set-row"><span>Browser reminders<span class="hint-inline">Reminders appear when you open this page.</span></span>
+      <h3 data-i18n="reminders">Reminders</h3>
+      <div class="set-row"><span><span data-i18n="browserReminders">Browser reminders</span><span class="hint-inline" data-i18n="remindersNote">Reminders appear when you open this page.</span></span>
         <input type="checkbox" id="setReminders">
       </div>
     </div>
 
     <div class="set-section">
-      <h3>Sections</h3>
-      <div class="set-row"><span>Show profile card</span><input type="checkbox" id="setShowProfile"></div>
-      <div class="set-row"><span>Show calendar</span><input type="checkbox" id="setShowCalendar"></div>
-      <div class="set-row"><span>Show activity log</span><input type="checkbox" id="setShowLog"></div>
+      <h3 data-i18n="sections">Sections</h3>
+      <div class="set-row"><span data-i18n="showProfile">Show profile card</span><input type="checkbox" id="setShowProfile"></div>
+      <div class="set-row"><span data-i18n="showCalendar">Show calendar</span><input type="checkbox" id="setShowCalendar"></div>
+      <div class="set-row"><span data-i18n="showLog">Show activity log</span><input type="checkbox" id="setShowLog"></div>
     </div>
 
     <div class="set-section">
-      <h3>Social profiles</h3>
-      <p class="hint">These links appear on your profile card. Edit a handle or URL, remove a platform, or add your own.</p>
+      <h3 data-i18n="socialProfiles">Social profiles</h3>
+      <p class="hint" data-i18n="socialHint">These links appear on your profile card. Edit a handle or URL, remove a platform, or add your own.</p>
       <div id="profilesEditor"></div>
-      <button class="mini-btn" id="addProfileBtn">+ Add profile</button>
+      <button class="mini-btn" id="addProfileBtn" data-i18n="addProfile">+ Add profile</button>
     </div>
 
     <div class="set-section">
-      <h3>Data</h3>
-      <p class="hint">Back up your data, or move it to another device with the sync code.</p>
+      <h3 data-i18n="dataTitle">Data</h3>
+      <p class="hint" data-i18n="dataHint">Back up your data, or move it to another device with the sync code.</p>
       <div class="set-actions">
-        <button class="btn btn-ghost btn-sm" id="setExportBtn">Export</button>
-        <button class="btn btn-ghost btn-sm" id="setImportBtn">Import</button>
-        <button class="btn btn-ghost btn-sm" id="copySyncBtn">Copy sync code</button>
-        <button class="btn btn-ghost btn-sm" id="pasteSyncBtn">Paste sync code</button>
-        <button class="btn btn-danger btn-sm" id="wipeBtn">Delete all data</button>
+        <button class="btn btn-ghost btn-sm" id="setExportBtn" data-i18n="exportBtn">Export</button>
+        <button class="btn btn-ghost btn-sm" id="setImportBtn" data-i18n="importBtn">Import</button>
+        <button class="btn btn-ghost btn-sm" id="setIcsBtn" data-i18n="exportIcs">Export deadlines (.ics)</button>
+        <button class="btn btn-ghost btn-sm" id="copySyncBtn" data-i18n="copySync">Copy sync code</button>
+        <button class="btn btn-ghost btn-sm" id="pasteSyncBtn" data-i18n="pasteSync">Paste sync code</button>
+        <button class="btn btn-danger btn-sm" id="wipeBtn" data-i18n="deleteAll">Delete all data</button>
       </div>
     </div>
 
     <div class="set-section">
-      <h3>Install as an app</h3>
-      <p class="hint">Open this site in your phone browser, tap the menu, then "Add to Home screen". It will open like an app from your home screen.</p>
+      <h3 data-i18n="installTitle">Install as an app</h3>
+      <p class="hint" data-i18n="installHint">Open this site in your phone browser, tap the menu, then "Add to Home screen". It will open like an app from your home screen.</p>
     </div>
   </section>
 </div>
 
 <!-- Bottom navigation -->
 <nav class="bottomnav" id="bottomNav">
-  <button data-view="home" class="active"><span class="ic">🏠</span><span>Home</span></button>
-  <button data-view="calendar"><span class="ic">📅</span><span>Calendar</span></button>
-  <button data-view="tasks"><span class="ic">✅</span><span>Tasks</span></button>
-  <button data-view="settings"><span class="ic">⚙️</span><span>Settings</span></button>
+  <button data-view="home" class="active"><span class="ic">🏠</span><span data-i18n="navHome">Home</span></button>
+  <button data-view="calendar"><span class="ic">📅</span><span data-i18n="navCalendar">Calendar</span></button>
+  <button data-view="tasks"><span class="ic">✅</span><span data-i18n="navTasks">Tasks</span></button>
+  <button data-view="settings"><span class="ic">⚙️</span><span data-i18n="navSettings">Settings</span></button>
 </nav>
 
 <!-- Add / edit form -->
 <div class="overlay" id="formOverlay" role="dialog" aria-modal="true">
   <form class="sheet" id="airdropForm">
     <h2 id="formTitle">Add Airdrop</h2>
-    <p class="sub">Fill in what you know — you can edit the rest later.</p>
+    <p class="sub" data-i18n="formSub">Fill in what you know — you can edit the rest later.</p>
     <input type="hidden" id="editId">
     <div class="field">
-      <label for="fName">Airdrop name *</label>
-      <input id="fName" required maxlength="80" placeholder="e.g. Dow Protocol">
+      <label for="fName" data-i18n="fName">Airdrop name *</label>
+      <input id="fName" required maxlength="80" placeholder="e.g. Dow Protocol" data-i18n-ph="fNamePh">
     </div>
     <div class="field">
-      <label for="fLink">Link</label>
+      <label for="fLink" data-i18n="fLink">Link</label>
       <input id="fLink" type="url" placeholder="https://...">
     </div>
     <div class="row3">
       <div class="field">
-        <label for="fStatus">Status</label>
+        <label for="fStatus" data-i18n="fStatus">Status</label>
         <select id="fStatus">
-          <option value="running">Running</option>
-          <option value="waiting">Waiting</option>
-          <option value="done">Done</option>
+          <option value="running" data-i18n="stRunning">Running</option>
+          <option value="waiting" data-i18n="stWaiting">Waiting</option>
+          <option value="done" data-i18n="stDone">Done</option>
         </select>
       </div>
       <div class="field">
-        <label for="fCategory">Category</label>
+        <label for="fCategory" data-i18n="fCategory">Category</label>
         <select id="fCategory">
-          <option value="Points">Points</option>
-          <option value="Testnet">Testnet</option>
-          <option value="Whitelist">Whitelist</option>
-          <option value="NFT">NFT</option>
-          <option value="Other">Other</option>
+          <option value="Points" data-i18n="catPoints">Points</option>
+          <option value="Testnet" data-i18n="catTestnet">Testnet</option>
+          <option value="Whitelist" data-i18n="catWhitelist">Whitelist</option>
+          <option value="NFT" data-i18n="catNFT">NFT</option>
+          <option value="Other" data-i18n="catOther">Other</option>
         </select>
       </div>
       <div class="field">
-        <label for="fChain">Chain / network</label>
+        <label for="fChain" data-i18n="fChain">Chain / network</label>
         <input id="fChain" maxlength="30" placeholder="Base / BNB / Solana">
       </div>
     </div>
     <div class="row3">
       <div class="field">
-        <label for="fPoints">Points</label>
+        <label for="fPoints" data-i18n="fPoints">Points</label>
         <input id="fPoints" type="number" min="0" step="1" placeholder="0">
       </div>
       <div class="field">
-        <label for="fCost">Cost (Rp)</label>
+        <label for="fCost" data-i18n="fCost">Cost (Rp)</label>
         <input id="fCost" type="number" min="0" step="1" placeholder="0">
       </div>
       <div class="field">
-        <label for="fDeadline">Deadline</label>
+        <label for="fDeadline" data-i18n="fDeadline">Deadline</label>
         <input id="fDeadline" type="date">
       </div>
     </div>
     <div class="row2">
       <div class="field">
-        <label for="fValue">Estimated value (Rp)</label>
+        <label for="fValue" data-i18n="fValue">Estimated value (Rp)</label>
         <input id="fValue" type="number" min="0" step="1" placeholder="0">
       </div>
       <div class="field">
-        <label for="fEffort">Effort</label>
+        <label for="fEffort" data-i18n="fEffort">Effort</label>
         <select id="fEffort">
-          <option value="light">Light</option>
-          <option value="medium" selected>Medium</option>
-          <option value="heavy">Heavy</option>
+          <option value="light" data-i18n="effLight">Light</option>
+          <option value="medium" selected data-i18n="effMedium">Medium</option>
+          <option value="heavy" data-i18n="effHeavy">Heavy</option>
         </select>
       </div>
     </div>
     <div class="row2">
       <div class="field">
-        <label for="fWallet">Wallet used</label>
+        <label for="fToken" data-i18n="fToken">Token</label>
+        <input id="fToken" maxlength="40" placeholder="e.g. bitcoin or BTC" data-i18n-ph="fTokenPh">
+      </div>
+      <div class="field">
+        <label for="fExpected" data-i18n="fExpected">Expected tokens</label>
+        <input id="fExpected" type="number" min="0" step="any" placeholder="0">
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label for="fWallet" data-i18n="fWallet">Wallet used</label>
         <input id="fWallet" maxlength="60" placeholder="Main / Hunting">
       </div>
       <div class="field">
-        <label for="fSource">Info source</label>
+        <label for="fSource" data-i18n="fSource">Info source</label>
         <input id="fSource" maxlength="60" placeholder="Airdrop Finder / X / Discord">
       </div>
     </div>
     <div class="field">
-      <label for="fReward">Estimated reward</label>
+      <label for="fReward" data-i18n="fReward">Estimated reward</label>
       <input id="fReward" maxlength="100" placeholder="e.g. Token, NFT, $50">
     </div>
     <div class="field">
-      <label for="fNext">Next step</label>
-      <input id="fNext" maxlength="140" placeholder="e.g. Daily check-in">
+      <label for="fNext" data-i18n="fNext">Next step</label>
+      <input id="fNext" maxlength="140" placeholder="e.g. Daily check-in" data-i18n-ph="fNextPh">
     </div>
     <div class="field">
-      <label>Task checklist</label>
+      <label data-i18n="fTasks">Task checklist</label>
       <div class="form-tasks" id="formTasks"></div>
-      <button type="button" class="mini-btn" id="addFormTaskBtn">+ Add task</button>
+      <button type="button" class="mini-btn" id="addFormTaskBtn" data-i18n="fAddTask">+ Add task</button>
     </div>
     <div class="field">
-      <label for="fNotes">Notes</label>
-      <textarea id="fNotes" maxlength="500" placeholder="Requirements, accounts used, etc."></textarea>
+      <label for="fNotes" data-i18n="fNotes">Notes</label>
+      <textarea id="fNotes" maxlength="500" placeholder="Requirements, accounts used, etc." data-i18n-ph="fNotesPh"></textarea>
     </div>
     <div class="sheet-actions">
-      <button type="button" class="btn btn-ghost" id="cancelBtn">Cancel</button>
-      <button type="submit" class="btn btn-primary">Save</button>
+      <button type="button" class="btn btn-ghost" id="cancelBtn" data-i18n="cancel">Cancel</button>
+      <button type="submit" class="btn btn-primary" data-i18n="save">Save</button>
     </div>
   </form>
 </div>
@@ -585,12 +652,12 @@
 <!-- Delete confirm -->
 <div class="overlay" id="deleteOverlay" role="dialog" aria-modal="true">
   <div class="sheet">
-    <h2>Delete this airdrop?</h2>
-    <p class="sub">Deleted data can't be restored.</p>
+    <h2 data-i18n="delTitle">Delete this airdrop?</h2>
+    <p class="sub" data-i18n="delSub">Deleted data can't be restored.</p>
     <div class="confirm-box" id="deleteName"></div>
     <div class="sheet-actions">
-      <button class="btn btn-ghost" id="deleteCancelBtn">Cancel</button>
-      <button class="btn btn-danger" id="deleteConfirmBtn">Yes, delete</button>
+      <button class="btn btn-ghost" id="deleteCancelBtn" data-i18n="cancel">Cancel</button>
+      <button class="btn btn-danger" id="deleteConfirmBtn" data-i18n="delYes">Yes, delete</button>
     </div>
   </div>
 </div>
@@ -598,12 +665,12 @@
 <!-- Proof lightbox -->
 <div class="overlay" id="proofOverlay" role="dialog" aria-modal="true">
   <div class="sheet">
-    <h2>Proof</h2>
+    <h2 data-i18n="proofTitle">Proof</h2>
     <p class="sub" id="proofCaption"></p>
     <img class="lightbox-img" id="proofImg" alt="Task proof">
     <div class="sheet-actions">
-      <button class="btn btn-ghost" id="proofCloseBtn">Close</button>
-      <button class="btn btn-danger" id="proofDeleteBtn">Delete proof</button>
+      <button class="btn btn-ghost" id="proofCloseBtn" data-i18n="proofClose">Close</button>
+      <button class="btn btn-danger" id="proofDeleteBtn" data-i18n="proofDelete">Delete proof</button>
     </div>
   </div>
 </div>
@@ -611,17 +678,33 @@
 <!-- Paste sync code -->
 <div class="overlay" id="syncOverlay" role="dialog" aria-modal="true">
   <div class="sheet">
-    <h2>Paste sync code</h2>
-    <p class="sub">Paste the code copied from your other device. Matching airdrops are updated, new ones are added.</p>
-    <textarea class="sync-textarea" id="syncCodeInput" placeholder="Paste the sync code here…"></textarea>
+    <h2 data-i18n="syncTitle">Paste sync code</h2>
+    <p class="sub" data-i18n="syncSub">Paste the code copied from your other device. Matching airdrops are updated, new ones are added.</p>
+    <textarea class="sync-textarea" id="syncCodeInput" placeholder="Paste the sync code here…" data-i18n-ph="syncPh"></textarea>
     <div class="sheet-actions">
-      <button class="btn btn-ghost" id="syncCancelBtn">Cancel</button>
-      <button class="btn btn-primary" id="syncApplyBtn">Apply</button>
+      <button class="btn btn-ghost" id="syncCancelBtn" data-i18n="cancel">Cancel</button>
+      <button class="btn btn-primary" id="syncApplyBtn" data-i18n="syncApply">Apply</button>
     </div>
   </div>
 </div>
 
 <input type="file" id="proofFile" accept="image/*" hidden>
+
+<!-- PIN lock screen -->
+<div class="lock-screen" id="lockScreen" hidden>
+  <div class="lock-avatar" id="lockAvatar">X</div>
+  <h2 data-i18n="unlockTitle">Enter your PIN</h2>
+  <div class="pin-dots" id="pinDots">
+    <span class="pin-dot"></span><span class="pin-dot"></span><span class="pin-dot"></span><span class="pin-dot"></span>
+  </div>
+  <p class="pin-err" id="pinErr"></p>
+  <div class="pin-pad" id="pinPad">
+    <button class="pin-key" data-pin-key="1">1</button><button class="pin-key" data-pin-key="2">2</button><button class="pin-key" data-pin-key="3">3</button>
+    <button class="pin-key" data-pin-key="4">4</button><button class="pin-key" data-pin-key="5">5</button><button class="pin-key" data-pin-key="6">6</button>
+    <button class="pin-key" data-pin-key="7">7</button><button class="pin-key" data-pin-key="8">8</button><button class="pin-key" data-pin-key="9">9</button>
+    <button class="pin-key" data-pin-key="clear">C</button><button class="pin-key" data-pin-key="0">0</button><button class="pin-key" data-pin-key="back">⌫</button>
+  </div>
+</div>
 
 <script>
 (function(){
@@ -644,11 +727,30 @@
   ];
   function defaultSettings(){
     return {
-      displayName:"Xann", theme:"auto", reminders:false,
+      displayName:"Xann", theme:"auto", reminders:false, lang:"en", pin:"",
       showCalendar:true, showLog:true, showProfile:true,
       density:"comfortable",
       profiles: JSON.parse(JSON.stringify(DEFAULT_PROFILES))
     };
+  }
+
+  /* ---------- live prices cache (loaded before items so normalizeItem can use it) ---------- */
+  var PRICES_KEY = "airdrop-tracker-prices";
+  var SYMBOL_MAP = {BTC:"bitcoin", ETH:"ethereum", SOL:"solana", BNB:"binancecoin", USDT:"tether",
+    USDC:"usd-coin", XRP:"ripple", DOGE:"dogecoin", ADA:"cardano", AVAX:"avalanche-2", DOT:"polkadot", LINK:"chainlink"};
+  var pricesStale = false;
+  function loadPricesCache(){
+    try { var raw = localStorage.getItem(PRICES_KEY); if(raw){ var o = JSON.parse(raw); if(o && o.prices) return o; } } catch(e){}
+    return {prices: {}, at: 0};
+  }
+  function savePricesCache(){ try { localStorage.setItem(PRICES_KEY, JSON.stringify(pricesCache)); } catch(e){} }
+  var pricesCache = loadPricesCache();
+  function resolveTokenId(input){
+    var s = String(input || "").trim();
+    if(!s) return "";
+    var up = s.toUpperCase();
+    if(SYMBOL_MAP[up]) return SYMBOL_MAP[up];
+    return s.toLowerCase().replace(/\s+/g, "-");
   }
 
   var items = loadItems();
@@ -700,9 +802,242 @@
     return d.toLocaleDateString("en-GB", {day:"numeric", month:"short", year:"numeric"}) + ", " +
       d.toLocaleTimeString("en-GB", {hour:"2-digit", minute:"2-digit"});
   }
-  function statusLabel(s){ return s === "running" ? "Running" : s === "waiting" ? "Waiting" : "Done"; }
+  function statusLabel(s){ return s === "running" ? t("stRunning") : s === "waiting" ? t("stWaiting") : t("stDone"); }
   function statusClass(s){ return s === "running" ? "badge-running" : s === "waiting" ? "badge-waiting" : "badge-done"; }
-  function effortLabel(e){ return e === "light" ? "Light" : e === "heavy" ? "Heavy" : "Medium"; }
+  function effortLabel(e){ return e === "light" ? t("effLight") : e === "heavy" ? t("effHeavy") : t("effMedium"); }
+
+  /* ---------- i18n ---------- */
+  var I18N = {
+    en: {
+      heroSub: "Every airdrop you're working on, in one place. Work through your daily checklist, watch your deadlines, and track your points.",
+      statPoints: "TOTAL POINTS", statTasks: "TODAY'S TASKS", statActive: "ACTIVE AIRDROPS",
+      statCost: "TOTAL COST", statValue: "ESTIMATED VALUE", statProfit: "POTENTIAL PROFIT",
+      statsTitle: "Statistics", pointsOverTime: "Points over time",
+      costVsValue: "Cost vs estimated value by category",
+      noChartData: "No data yet — charts will appear as you log points.",
+      noCatData: "Add a cost or estimated value to see this chart.",
+      urgentTitle: "Urgent this week", noUrgent: "No urgent deadlines this week.",
+      enableReminders: "Enable browser reminders", remindersOn: "Browser reminders on",
+      remindersBlocked: "Reminders blocked in browser settings",
+      remindersUnsupported: "Browser reminders not supported",
+      remindersNote: "Reminders appear when you open this page.",
+      todayTitle: "Today's tasks",
+      noDaily: "No daily tasks. Add a task and tick “Daily” in the airdrop form and it will show up here every day.",
+      searchPh: "Search airdrops, tasks, notes...", addAirdrop: "+ Add Airdrop",
+      templatePh: "Add from template…", tplTestnet: "Testnet", tplPoints: "Points / Quest",
+      tplWhitelist: "Whitelist", tplDaily: "Daily Check-in",
+      exportBtn: "Export", importBtn: "Import", refreshPrices: "Refresh prices",
+      chipAll: "All", chipRunning: "Running", chipWaiting: "Waiting", chipDone: "Done", chipArchived: "Archived",
+      allCats: "All categories", allWallets: "All wallets",
+      sortUpdated: "Recently updated", sortDeadline: "Nearest deadline", sortPoints: "Highest points",
+      sortPriority: "Highest priority", sortName: "Name A–Z",
+      emptyTitle: "No airdrops yet",
+      emptyText: "Your tracker is empty. Add your first airdrop — fill in the name, category, and task checklist, so every step is tracked until it pays off.",
+      logTitle: "Activity log", noActivity: "No activity yet.",
+      footer1: "Your data is stored in this browser. Export a backup regularly.",
+      footer2: "Sync between devices: copy the sync code on one device and paste it on another — automatic sync needs an account and is not available in this version.",
+      footer3: "Add to home screen from your browser menu to open it like an app.",
+      calTitle: "Calendar", calDeadlines: "Deadlines",
+      calHidden: "Calendar is hidden. Turn it on in Settings → Sections.",
+      noDeadlinesDay: "No deadlines on this day.",
+      tasksTitle: "All tasks", noTasksTitle: "No tasks yet",
+      noTasksText: "Add tasks to your airdrops and they will show up here, grouped by airdrop.",
+      settingsTitle: "Settings", setProfile: "My Profile",
+      setProfileHint: "Your display name is shown on your profile card.",
+      displayName: "Display name", language: "Language", languageLabel: "Language / Bahasa",
+      appearance: "Appearance", theme: "Theme", themeAuto: "Automatic", themeLight: "Light", themeDark: "Dark",
+      density: "Card density", densityComfortable: "Comfortable", densityCompact: "Compact",
+      reminders: "Reminders", browserReminders: "Browser reminders", sections: "Sections",
+      showProfile: "Show profile card", showCalendar: "Show calendar", showLog: "Show activity log",
+      socialProfiles: "Social profiles",
+      socialHint: "These links appear on your profile card. Edit a handle or URL, remove a platform, or add your own.",
+      addProfile: "+ Add profile", dataTitle: "Data",
+      dataHint: "Back up your data, or move it to another device with the sync code.",
+      copySync: "Copy sync code", pasteSync: "Paste sync code", deleteAll: "Delete all data",
+      exportIcs: "Export deadlines (.ics)", installTitle: "Install as an app",
+      installHint: "Open this site in your phone browser, tap the menu, then \"Add to Home screen\". It will open like an app from your home screen.",
+      appLock: "App lock (PIN)",
+      pinHint: "Protect this app with a 4-digit PIN. The PIN only protects the app on this device — it is stored locally and is not high security.",
+      pinSetTitle: "Set a PIN", pinNew: "New PIN (4 digits)", pinConfirm: "Confirm PIN",
+      pinSetBtn: "Set PIN", pinHas: "A PIN is set.", pinChange: "Change PIN", pinRemove: "Remove PIN",
+      pinLockNow: "Lock now", pinCurrent: "Current PIN", pinMismatch: "PINs don't match. Try again.",
+      pinWrongCurrent: "Wrong current PIN.", pinNeed4: "Enter a 4-digit PIN.", pinSetOk: "PIN set.",
+      pinRemoved: "PIN removed.", unlockTitle: "Enter your PIN", pinWrong: "Wrong PIN. Try again.",
+      navHome: "Home", navCalendar: "Calendar", navTasks: "Tasks", navSettings: "Settings",
+      formAdd: "Add Airdrop", formEdit: "Edit Airdrop",
+      formSub: "Fill in what you know — you can edit the rest later.",
+      fName: "Airdrop name *", fNamePh: "e.g. Dow Protocol", fLink: "Link", fStatus: "Status",
+      stRunning: "Running", stWaiting: "Waiting", stDone: "Done",
+      fCategory: "Category", catPoints: "Points", catTestnet: "Testnet", catWhitelist: "Whitelist",
+      catNFT: "NFT", catOther: "Other", fChain: "Chain / network", fPoints: "Points",
+      fCost: "Cost (Rp)", fDeadline: "Deadline", fValue: "Estimated value (Rp)", fEffort: "Effort",
+      effLight: "Light", effMedium: "Medium", effHeavy: "Heavy",
+      fToken: "Token", fTokenPh: "e.g. bitcoin or BTC", fExpected: "Expected tokens",
+      fWallet: "Wallet used", fSource: "Info source", fReward: "Estimated reward",
+      fNext: "Next step", fNextPh: "e.g. Daily check-in", fTasks: "Task checklist",
+      fAddTask: "+ Add task", fNotes: "Notes", fNotesPh: "Requirements, accounts used, etc.",
+      cancel: "Cancel", save: "Save", delTitle: "Delete this airdrop?",
+      delSub: "Deleted data can't be restored.", delYes: "Yes, delete",
+      proofTitle: "Proof", proofClose: "Close", proofDelete: "Delete proof",
+      syncTitle: "Paste sync code",
+      syncSub: "Paste the code copied from your other device. Matching airdrops are updated, new ones are added.",
+      syncPh: "Paste the sync code here…", syncApply: "Apply",
+      noMatches: "No matches", noMatchesText: "Try a different filter or search term.",
+      taskProgress: "Task progress:", nextStep: "Next step:", pointsWord: "points",
+      costWord: "Cost", estValueWord: "Estimated value", potProfitWord: "Potential profit",
+      effortWord: "Effort", estRewardWord: "Estimated reward",
+      openLink: "↗ Open link", openWord: "↗ Open",
+      editBtn: "Edit", dupBtn: "Duplicate", archiveBtn: "Archive", restoreBtn: "Restore", deleteBtn: "Delete",
+      addTaskPh: "Add a task...", addFirstTaskPh: "Add your first task...", addBtn: "Add",
+      dailyTag: "DAILY", lastCheckin: "Last check-in:", day: "day", days: "days",
+      overdueBy: "Overdue by", leftWord: "left", deadlineToday: "Deadline today",
+      priHigh: "High priority", priMedium: "Medium priority", priLow: "Low priority",
+      livePrice: "Live price", liveValue: "Live value", priceOutdated: "Price may be outdated",
+      pricesUpdated: "Prices updated.",
+      pricesFailed: "Couldn't fetch prices — showing the last saved prices.",
+      noTokenMsg: "Add a token to an airdrop to see live prices.",
+      icsDownloaded: "Calendar file downloaded — import it into Google Calendar.",
+      icsAdd: "Add to calendar", noDeadlinesExport: "No deadlines to export.",
+      noTasksForm: "No tasks yet. Example: Follow X, Join Telegram, Daily check-in.",
+      storageFull: "Storage is full — delete some proof photos or export a backup first.",
+      importComplete: "Import complete:", newWord: "new", updatedWord: "updated",
+      syncComplete: "Sync complete:", syncCopiedA: "Sync code copied (",
+      syncCopiedB: " characters). Paste it on your other device.",
+      syncBad: "That code couldn't be read. Check the code and try again.",
+      fileBad: "This file couldn't be read. Make sure it's a JSON file exported from this tracker.",
+      allDeleted: "All data deleted.",
+      wipeConfirm: "Tap again to confirm — this erases everything",
+      copyFailed: "Copy failed — select the code manually.",
+      imageBad: "That image couldn't be read.",
+      notifUnsupported: "Browser notifications are not supported here.",
+      notifBlocked: "Notifications are blocked for this site. Allow them in your browser settings.",
+      taskPh: "Task...", platformPh: "Platform", handlePh: "@handle"
+    },
+    id: {
+      heroSub: "Semua airdrop yang sedang kamu kerjakan, dalam satu tempat. Kerjakan checklist harianmu, pantau deadline, dan lacak poinmu.",
+      statPoints: "TOTAL POIN", statTasks: "TUGAS HARI INI", statActive: "AIRDROP AKTIF",
+      statCost: "TOTAL BIAYA", statValue: "ESTIMASI NILAI", statProfit: "POTENSI UNTUNG",
+      statsTitle: "Statistik", pointsOverTime: "Poin dari waktu ke waktu",
+      costVsValue: "Biaya vs estimasi nilai per kategori",
+      noChartData: "Belum ada data — grafik akan muncul setelah kamu mencatat poin.",
+      noCatData: "Tambahkan biaya atau estimasi nilai untuk melihat grafik ini.",
+      urgentTitle: "Mendesak minggu ini", noUrgent: "Tidak ada deadline mendesak minggu ini.",
+      enableReminders: "Aktifkan pengingat browser", remindersOn: "Pengingat browser aktif",
+      remindersBlocked: "Pengingat diblokir di pengaturan browser",
+      remindersUnsupported: "Pengingat browser tidak didukung",
+      remindersNote: "Pengingat muncul saat kamu membuka halaman ini.",
+      todayTitle: "Tugas hari ini",
+      noDaily: "Tidak ada tugas harian. Tambahkan tugas dan centang “Harian” di formulir airdrop, tugas itu akan muncul di sini setiap hari.",
+      searchPh: "Cari airdrop, tugas, catatan...", addAirdrop: "+ Tambah Airdrop",
+      templatePh: "Tambah dari template…", tplTestnet: "Testnet", tplPoints: "Points / Quest",
+      tplWhitelist: "Whitelist", tplDaily: "Check-in Harian",
+      exportBtn: "Export", importBtn: "Import", refreshPrices: "Perbarui harga",
+      chipAll: "Semua", chipRunning: "Lagi jalan", chipWaiting: "Nunggu", chipDone: "Selesai", chipArchived: "Diarsipkan",
+      allCats: "Semua kategori", allWallets: "Semua wallet",
+      sortUpdated: "Terbaru diubah", sortDeadline: "Deadline terdekat", sortPoints: "Poin tertinggi",
+      sortPriority: "Prioritas tertinggi", sortName: "Nama A–Z",
+      emptyTitle: "Belum ada airdrop",
+      emptyText: "Tracker masih kosong. Tambah airdrop pertamamu — isi nama, kategori, dan checklist tugasnya, biar setiap langkah terpantau sampai cair.",
+      logTitle: "Riwayat aktivitas", noActivity: "Belum ada aktivitas.",
+      footer1: "Datamu tersimpan di browser ini. Export cadangan secara berkala.",
+      footer2: "Sinkron antar perangkat: salin kode sinkron di satu perangkat dan tempel di perangkat lain — sinkron otomatis butuh akun dan belum tersedia di versi ini.",
+      footer3: "Tambahkan ke layar utama dari menu browser agar terbuka seperti aplikasi.",
+      calTitle: "Kalender", calDeadlines: "Deadline",
+      calHidden: "Kalender disembunyikan. Nyalakan di Pengaturan → Bagian.",
+      noDeadlinesDay: "Tidak ada deadline di hari ini.",
+      tasksTitle: "Semua tugas", noTasksTitle: "Belum ada tugas",
+      noTasksText: "Tambahkan tugas ke airdropmu dan tugas itu akan muncul di sini, dikelompokkan per airdrop.",
+      settingsTitle: "Pengaturan", setProfile: "Profil Saya",
+      setProfileHint: "Nama tampilanmu ditampilkan di kartu profil.",
+      displayName: "Nama tampilan", language: "Bahasa", languageLabel: "Language / Bahasa",
+      appearance: "Tampilan", theme: "Tema", themeAuto: "Otomatis", themeLight: "Terang", themeDark: "Gelap",
+      density: "Kepadatan kartu", densityComfortable: "Nyaman", densityCompact: "Kompak",
+      reminders: "Pengingat", browserReminders: "Pengingat browser", sections: "Bagian",
+      showProfile: "Tampilkan kartu profil", showCalendar: "Tampilkan kalender", showLog: "Tampilkan riwayat aktivitas",
+      socialProfiles: "Profil media sosial",
+      socialHint: "Tautan ini muncul di kartu profilmu. Edit handle atau URL, hapus platform, atau tambah sendiri.",
+      addProfile: "+ Tambah profil", dataTitle: "Data",
+      dataHint: "Cadangkan datamu, atau pindahkan ke perangkat lain dengan kode sinkron.",
+      copySync: "Salin kode sinkron", pasteSync: "Tempel kode sinkron", deleteAll: "Hapus semua data",
+      exportIcs: "Export deadline (.ics)", installTitle: "Install sebagai aplikasi",
+      installHint: "Buka situs ini di browser HP, ketuk menu, lalu \"Tambahkan ke layar utama\". Situs akan terbuka seperti aplikasi dari layar utama.",
+      appLock: "Kunci aplikasi (PIN)",
+      pinHint: "Lindungi aplikasi ini dengan PIN 4 digit. PIN hanya melindungi aplikasi di perangkat ini — PIN tersimpan secara lokal dan bukan keamanan tingkat tinggi.",
+      pinSetTitle: "Atur PIN", pinNew: "PIN baru (4 digit)", pinConfirm: "Konfirmasi PIN",
+      pinSetBtn: "Atur PIN", pinHas: "PIN sudah diatur.", pinChange: "Ubah PIN", pinRemove: "Hapus PIN",
+      pinLockNow: "Kunci sekarang", pinCurrent: "PIN saat ini", pinMismatch: "PIN tidak cocok. Coba lagi.",
+      pinWrongCurrent: "PIN saat ini salah.", pinNeed4: "Masukkan PIN 4 digit.", pinSetOk: "PIN sudah diatur.",
+      pinRemoved: "PIN dihapus.", unlockTitle: "Masukkan PIN", pinWrong: "PIN salah. Coba lagi.",
+      navHome: "Beranda", navCalendar: "Kalender", navTasks: "Tugas", navSettings: "Pengaturan",
+      formAdd: "Tambah Airdrop", formEdit: "Edit Airdrop",
+      formSub: "Isi yang kamu tahu saja — sisanya bisa diedit nanti.",
+      fName: "Nama airdrop *", fNamePh: "contoh: Dow Protocol", fLink: "Tautan", fStatus: "Status",
+      stRunning: "Lagi jalan", stWaiting: "Nunggu", stDone: "Selesai",
+      fCategory: "Kategori", catPoints: "Points", catTestnet: "Testnet", catWhitelist: "Whitelist",
+      catNFT: "NFT", catOther: "Lainnya", fChain: "Chain / jaringan", fPoints: "Poin",
+      fCost: "Biaya (Rp)", fDeadline: "Deadline", fValue: "Estimasi nilai (Rp)", fEffort: "Usaha",
+      effLight: "Ringan", effMedium: "Sedang", effHeavy: "Berat",
+      fToken: "Token", fTokenPh: "contoh: bitcoin atau BTC", fExpected: "Token yang diharapkan",
+      fWallet: "Wallet yang dipakai", fSource: "Sumber info", fReward: "Estimasi reward",
+      fNext: "Langkah berikutnya", fNextPh: "contoh: Check-in harian", fTasks: "Checklist tugas",
+      fAddTask: "+ Tambah tugas", fNotes: "Catatan", fNotesPh: "Syarat, akun yang dipakai, dll.",
+      cancel: "Batal", save: "Simpan", delTitle: "Hapus airdrop ini?",
+      delSub: "Data yang sudah dihapus tidak bisa dikembalikan.", delYes: "Ya, hapus",
+      proofTitle: "Bukti", proofClose: "Tutup", proofDelete: "Hapus bukti",
+      syncTitle: "Tempel kode sinkron",
+      syncSub: "Tempel kode yang disalin dari perangkat lain. Airdrop yang sama diperbarui, yang baru ditambahkan.",
+      syncPh: "Tempel kode sinkron di sini…", syncApply: "Terapkan",
+      noMatches: "Tidak ada yang cocok", noMatchesText: "Coba filter atau kata pencarian lain.",
+      taskProgress: "Progres tugas:", nextStep: "Langkah berikutnya:", pointsWord: "poin",
+      costWord: "Biaya", estValueWord: "Estimasi nilai", potProfitWord: "Potensi untung",
+      effortWord: "Usaha", estRewardWord: "Estimasi reward",
+      openLink: "↗ Buka tautan", openWord: "↗ Buka",
+      editBtn: "Edit", dupBtn: "Duplikat", archiveBtn: "Arsipkan", restoreBtn: "Pulihkan", deleteBtn: "Hapus",
+      addTaskPh: "Tambah tugas...", addFirstTaskPh: "Tambah tugas pertama...", addBtn: "Tambah",
+      dailyTag: "HARIAN", lastCheckin: "Check-in terakhir:", day: "hari", days: "hari",
+      overdueBy: "Lewat", leftWord: "lagi", deadlineToday: "Deadline hari ini",
+      priHigh: "Prioritas tinggi", priMedium: "Prioritas sedang", priLow: "Prioritas rendah",
+      livePrice: "Harga live", liveValue: "Nilai live", priceOutdated: "Harga mungkin sudah lama",
+      pricesUpdated: "Harga diperbarui.",
+      pricesFailed: "Gagal mengambil harga — menampilkan harga terakhir yang tersimpan.",
+      noTokenMsg: "Tambahkan token ke airdrop untuk melihat harga live.",
+      icsDownloaded: "File kalender diunduh — impor ke Google Calendar.",
+      icsAdd: "Tambah ke kalender", noDeadlinesExport: "Tidak ada deadline untuk diexport.",
+      noTasksForm: "Belum ada tugas. Contoh: Follow X, Join Telegram, Check-in harian.",
+      storageFull: "Penyimpanan penuh — hapus beberapa foto bukti atau export cadangan dulu.",
+      importComplete: "Import selesai:", newWord: "baru", updatedWord: "diperbarui",
+      syncComplete: "Sinkron selesai:", syncCopiedA: "Kode sinkron disalin (",
+      syncCopiedB: " karakter). Tempel di perangkat lain.",
+      syncBad: "Kode itu tidak bisa dibaca. Periksa kodenya dan coba lagi.",
+      fileBad: "File ini tidak bisa dibaca. Pastikan file JSON hasil export dari tracker ini.",
+      allDeleted: "Semua data dihapus.",
+      wipeConfirm: "Ketuk lagi untuk konfirmasi — ini menghapus semuanya",
+      copyFailed: "Gagal menyalin — pilih kodenya secara manual.",
+      imageBad: "Gambar itu tidak bisa dibaca.",
+      notifUnsupported: "Notifikasi browser tidak didukung di sini.",
+      notifBlocked: "Notifikasi diblokir untuk situs ini. Izinkan di pengaturan browser.",
+      taskPh: "Tugas...", platformPh: "Platform", handlePh: "@handle"
+    }
+  };
+  function t(k){
+    var lang = (typeof settings !== "undefined" && settings && settings.lang) || "en";
+    var d = I18N[lang] || I18N.en;
+    if(d[k] !== undefined) return d[k];
+    return I18N.en[k] !== undefined ? I18N.en[k] : k;
+  }
+  function dayWord(n){ return Number(n) + " " + (Number(n) === 1 ? t("day") : t("days")); }
+  function deadlineCount(n){
+    if(settings.lang === "id") return Number(n) + " deadline";
+    return Number(n) + " deadline" + (Number(n) === 1 ? "" : "s");
+  }
+  function applyI18n(){
+    document.querySelectorAll("[data-i18n]").forEach(function(el){ el.textContent = t(el.getAttribute("data-i18n")); });
+    document.querySelectorAll("[data-i18n-ph]").forEach(function(el){ el.setAttribute("placeholder", t(el.getAttribute("data-i18n-ph"))); });
+    document.documentElement.lang = settings.lang || "en";
+    render();
+    renderSettingsForm();
+    renderPinSection();
+  }
 
   /* ---------- storage ---------- */
   function normalizeTask(t){
@@ -719,12 +1054,24 @@
     if(eff !== "light" && eff !== "medium" && eff !== "heavy") eff = "medium";
     var cat = it.category || "Points";
     if(cat === "Lainnya") cat = "Other";
+    var ph = Array.isArray(it.pointHistory) ? it.pointHistory.slice() : [];
+    var pts = Number(it.points || 0);
+    if(ph.length === 0 && pts > 0) ph.push({d: todayStr(), p: pts});
+    var lastPrice = Number(it.lastPrice || 0), lastPriceAt = Number(it.lastPriceAt || 0);
+    var tok = it.token || "";
+    if(!lastPrice && tok && typeof pricesCache !== "undefined" && pricesCache.prices){
+      var cached = pricesCache.prices[resolveTokenId(tok)];
+      if(cached){ lastPrice = cached; lastPriceAt = pricesCache.at || 0; }
+    }
     return { id: it.id || uid(), name: it.name || "", link: it.link || "",
       status: it.status || "running", category: cat, chain: it.chain || "", wallet: it.wallet || "",
-      points: Number(it.points || 0), cost: Number(it.cost || 0),
+      points: pts, cost: Number(it.cost || 0),
       value: Number(it.value || 0), effort: eff,
       reward: it.reward || "", source: it.source || "",
       deadline: it.deadline || "", next: it.next || "", notes: it.notes || "",
+      token: tok, expectedTokens: Number(it.expectedTokens || 0),
+      lastPrice: lastPrice, lastPriceAt: lastPriceAt,
+      pointHistory: ph,
       archived: !!it.archived,
       tasks: Array.isArray(it.tasks) ? it.tasks.map(normalizeTask) : [],
       createdAt: it.createdAt || Date.now(), updatedAt: it.updatedAt || Date.now() };
@@ -743,7 +1090,7 @@
   function saveItems(list){
     try { localStorage.setItem(KEY, JSON.stringify(list)); return true; }
     catch(e){
-      alert("Storage is full — delete some proof photos or export a backup first.");
+      alert(t("storageFull"));
       return false;
     }
   }
@@ -782,7 +1129,7 @@
     if(v > 0 && v > c) return "medium";
     return "low";
   }
-  function priorityLabel(p){ return p === "high" ? "High priority" : p === "medium" ? "Medium priority" : "Low priority"; }
+  function priorityLabel(p){ return p === "high" ? t("priHigh") : p === "medium" ? t("priMedium") : t("priLow"); }
   function priorityClass(p){ return p === "high" ? "pri-high" : p === "medium" ? "pri-med" : "pri-low"; }
   function priorityRank(p){ return p === "high" ? 0 : p === "medium" ? 1 : 2; }
   function streakOf(t){
@@ -808,9 +1155,9 @@
     var dl = new Date(d + "T00:00:00"); if(isNaN(dl)) return null;
     var diff = Math.round((dl - today) / 86400000);
     var label = fmtDate(d);
-    if(diff < 0) return {text:"Overdue by " + Math.abs(diff) + " day" + (Math.abs(diff) === 1 ? "" : "s") + " • " + label, cls:"over", diff:diff};
-    if(diff === 0) return {text:"Deadline today • " + label, cls:"soon", diff:diff};
-    if(diff <= 7) return {text:diff + " day" + (diff === 1 ? "" : "s") + " left • " + label, cls:"soon", diff:diff};
+    if(diff < 0) return {text:t("overdueBy") + " " + dayWord(Math.abs(diff)) + " • " + label, cls:"over", diff:diff};
+    if(diff === 0) return {text:t("deadlineToday") + " • " + label, cls:"soon", diff:diff};
+    if(diff <= 7) return {text:dayWord(diff) + " " + t("leftWord") + " • " + label, cls:"soon", diff:diff};
     return {text:label, cls:"", diff:diff};
   }
   function urgentList(){
@@ -830,6 +1177,7 @@
     var dark = settings.theme === "dark" || (settings.theme === "auto" && darkMQ && darkMQ.matches);
     document.body.classList.toggle("dark", !!dark);
     document.body.classList.toggle("compact", settings.density === "compact");
+    if(typeof renderCharts === "function") renderCharts();
   }
   if(darkMQ && darkMQ.addEventListener){
     darkMQ.addEventListener("change", function(){ if(settings.theme === "auto") applyTheme(); });
@@ -877,7 +1225,7 @@
     var list = urgentList();
     var html = "";
     if(list.length === 0){
-      html = '<p class="panel-empty">No urgent deadlines this week.</p>';
+      html = '<p class="panel-empty">' + esc(t("noUrgent")) + '</p>';
     } else {
       list.forEach(function(r){
         html += '<div class="row-item urgent-row" data-urgent="' + r.it.id + '">' +
@@ -888,10 +1236,10 @@
     }
     urgentPanel.innerHTML = html;
     var btn = document.getElementById("notifyBtn");
-    if(!("Notification" in window)){ btn.textContent = "Browser reminders not supported"; btn.disabled = true; }
-    else if(Notification.permission === "denied"){ btn.textContent = "Reminders blocked in browser settings"; btn.disabled = true; }
-    else if(Notification.permission === "granted" && settings.reminders){ btn.textContent = "Browser reminders on"; btn.disabled = false; }
-    else { btn.textContent = "Enable browser reminders"; btn.disabled = false; }
+    if(!("Notification" in window)){ btn.textContent = t("remindersUnsupported"); btn.disabled = true; }
+    else if(Notification.permission === "denied"){ btn.textContent = t("remindersBlocked"); btn.disabled = true; }
+    else if(Notification.permission === "granted" && settings.reminders){ btn.textContent = t("remindersOn"); btn.disabled = false; }
+    else { btn.textContent = t("enableReminders"); btn.disabled = false; }
   }
   function renderToday(){
     var rows = [];
@@ -907,7 +1255,7 @@
     });
     var html = "";
     if(rows.length === 0){
-      html = '<p class="panel-empty">No daily tasks. Add a task and tick “Daily” in the airdrop form and it will show up here every day.</p>';
+      html = '<p class="panel-empty">' + esc(t("noDaily")) + '</p>';
     } else {
       rows.forEach(function(r){
         var done = taskDoneToday(r.t);
@@ -917,8 +1265,8 @@
           '<button class="check' + (done ? " done" : "") + '" data-today="' + r.it.id + ":" + r.t.id + '" aria-label="Mark done"></button>' +
           '<div style="flex:1; min-width:0"><div class="t-name">' + esc(r.t.text) + '</div>' +
           '<div class="t-sub">' + esc(r.it.name) +
-          (st >= 1 ? ' • 🔥 ' + st + ' day' + (st === 1 ? "" : "s") : "") +
-          (lc ? ' • Last check-in: ' + fmtDate(lc) : "") + '</div></div>' +
+          (st >= 1 ? ' • 🔥 ' + dayWord(st) : "") +
+          (lc ? ' • ' + esc(t("lastCheckin")) + ' ' + fmtDate(lc) : "") + '</div></div>' +
           (r.t.proof ? '<button class="proof-btn has-proof" data-proof-view="' + r.it.id + ":" + r.t.id + '" aria-label="View proof">📎</button>' : "") +
           '</div>';
       });
@@ -930,7 +1278,7 @@
     var cats = [];
     items.forEach(function(it){ if(it.category && cats.indexOf(it.category) === -1) cats.push(it.category); });
     var cur = sel.value;
-    sel.innerHTML = '<option value="all">All categories</option>';
+    sel.innerHTML = '<option value="all">' + esc(t("allCats")) + '</option>';
     cats.sort().forEach(function(c){
       var o = document.createElement("option"); o.value = c; o.textContent = c; sel.appendChild(o);
     });
@@ -942,7 +1290,7 @@
     var ws = [];
     items.forEach(function(it){ if(it.wallet && ws.indexOf(it.wallet) === -1) ws.push(it.wallet); });
     var cur = sel.value;
-    sel.innerHTML = '<option value="all">All wallets</option>';
+    sel.innerHTML = '<option value="all">' + esc(t("allWallets")) + '</option>';
     ws.sort().forEach(function(w){
       var o = document.createElement("option"); o.value = w; o.textContent = w; sel.appendChild(o);
     });
@@ -953,7 +1301,7 @@
     var box = document.getElementById("logBox");
     box.hidden = !settings.showLog;
     var html = "";
-    if(log.length === 0) html = '<li>No activity yet.</li>';
+    if(log.length === 0) html = '<li>' + esc(t("noActivity")) + '</li>';
     else log.forEach(function(e){
       html += '<li>' + esc(e.text) + '<time>' + fmtDateTime(e.t) + '</time></li>';
     });
@@ -967,13 +1315,13 @@
     return '<div class="task' + (checked ? " done" : "") + '">' +
       '<button class="check' + (checked ? " done" : "") + '" data-task="' + it.id + ":" + t.id + '" aria-label="Mark task"></button>' +
       '<span class="t-text">' + esc(t.text) + '</span>' +
-      (t.daily ? '<span class="daily-tag">DAILY</span>' : "") +
+      (t.daily ? '<span class="daily-tag">' + esc(t("dailyTag")) + '</span>' : "") +
       (st >= 1 ? '<span class="streak">🔥 ' + st + '</span>' : "") +
       '<button class="proof-btn' + (t.proof ? " has-proof" : "") + '" data-proof="' + it.id + ":" + t.id + '" aria-label="Attach or view proof">📎</button>' +
       '<button class="t-del" data-task-del="' + it.id + ":" + t.id + '" aria-label="Delete task">×</button></div>';
   }
   function render(){
-    renderStats(); renderProfile(); renderUrgent(); renderToday();
+    renderStats(); renderProfile(); renderUrgent(); renderToday(); renderCharts();
     renderCats(); renderWallets(); renderLog(); renderCalendar(); renderTasksView();
     var q = query.trim().toLowerCase();
     var list = items.filter(function(it){
@@ -1010,7 +1358,7 @@
     emptyState.hidden = visibleCount !== 0;
     if(visibleCount === 0){ return; }
     if(list.length === 0){
-      grid.innerHTML = '<div class="empty" style="grid-column:1/-1"><h2>No matches</h2><p>Try a different filter or search term.</p></div>';
+      grid.innerHTML = '<div class="empty" style="grid-column:1/-1"><h2>' + esc(t("noMatches")) + '</h2><p>' + esc(t("noMatchesText")) + '</p></div>';
       return;
     }
     list.forEach(function(it){
@@ -1030,46 +1378,168 @@
         (it.wallet ? '<span class="tag">👛 ' + esc(it.wallet) + '</span>' : "") +
         (it.source ? '<span class="tag">via ' + esc(it.source) + '</span>' : "") +
         '<span class="badge ' + priorityClass(pri) + '">' + priorityLabel(pri) + '</span></div>';
-      html += '<div class="points">' + fmtNum(it.points) + ' <small>points</small></div>';
+      html += '<div class="points">' + fmtNum(it.points) + ' <small>' + esc(t("pointsWord")) + '</small></div>';
       var kv = [];
-      if(it.cost) kv.push('<div><b>Cost</b><span>' + fmtRp(it.cost) + '</span></div>');
-      if(it.value) kv.push('<div><b>Estimated value</b><span>' + fmtRp(it.value) + '</span></div>');
-      if(it.value) kv.push('<div><b>Potential profit</b><span class="' + (profit >= 0 ? "profit-pos" : "profit-neg") + '">' + (profit < 0 ? "−" : "") + fmtRp(Math.abs(profit)) + '</span></div>');
-      kv.push('<div><b>Effort</b><span>' + effortLabel(it.effort) + '</span></div>');
-      if(it.reward) kv.push('<div><b>Estimated reward</b><span>' + esc(it.reward) + '</span></div>');
+      if(it.cost) kv.push('<div><b>' + esc(t("costWord")) + '</b><span>' + fmtRp(it.cost) + '</span></div>');
+      if(it.value) kv.push('<div><b>' + esc(t("estValueWord")) + '</b><span>' + fmtRp(it.value) + '</span></div>');
+      if(it.value) kv.push('<div><b>' + esc(t("potProfitWord")) + '</b><span class="' + (profit >= 0 ? "profit-pos" : "profit-neg") + '">' + (profit < 0 ? "−" : "") + fmtRp(Math.abs(profit)) + '</span></div>');
+      kv.push('<div><b>' + esc(t("effortWord")) + '</b><span>' + effortLabel(it.effort) + '</span></div>');
+      if(it.reward) kv.push('<div><b>' + esc(t("estRewardWord")) + '</b><span>' + esc(it.reward) + '</span></div>');
+      if(it.token && it.lastPrice){
+        kv.push('<div><b>' + esc(t("livePrice")) + ' (' + esc(it.token.toUpperCase()) + ')</b><span>' + fmtRp(it.lastPrice) + (pricesStale ? ' <span class="price-note">• ' + esc(t("priceOutdated")) + '</span>' : "") + '</span></div>');
+        if(it.expectedTokens > 0) kv.push('<div><b>' + esc(t("liveValue")) + '</b><span>' + fmtRp(it.lastPrice * Number(it.expectedTokens)) + '</span></div>');
+      }
       html += '<div class="kv">' + kv.join("") + '</div>';
-      if(it.next) html += '<div class="next">Next step: <b>' + esc(it.next) + '</b></div>';
+      if(it.next) html += '<div class="next">' + esc(t("nextStep")) + ' <b>' + esc(it.next) + '</b></div>';
       if(tasks.length){
-        html += '<div><div class="progress-label">Task progress: ' + doneCount + '/' + tasks.length + ' (' + pct + '%)</div>' +
+        html += '<div><div class="progress-label">' + esc(t("taskProgress")) + ' ' + doneCount + '/' + tasks.length + ' (' + pct + '%)</div>' +
           '<div class="progress" style="margin-top:5px"><i style="width:' + pct + '%"></i></div></div>';
         html += '<div class="tasks">';
         tasks.forEach(function(t){ html += taskRowHtml(it, t); });
-        html += '<div class="add-task"><input type="text" placeholder="Add a task..." data-add-task="' + it.id + '">' +
-          '<button data-add-task-btn="' + it.id + '">Add</button></div></div>';
+        html += '<div class="add-task"><input type="text" placeholder="' + esc(t("addTaskPh")) + '" data-add-task="' + it.id + '">' +
+          '<button data-add-task-btn="' + it.id + '">' + esc(t("addBtn")) + '</button></div></div>';
       } else {
-        html += '<div class="tasks"><div class="add-task"><input type="text" placeholder="Add your first task..." data-add-task="' + it.id + '">' +
-          '<button data-add-task-btn="' + it.id + '">Add</button></div></div>';
+        html += '<div class="tasks"><div class="add-task"><input type="text" placeholder="' + esc(t("addFirstTaskPh")) + '" data-add-task="' + it.id + '">' +
+          '<button data-add-task-btn="' + it.id + '">' + esc(t("addBtn")) + '</button></div></div>';
       }
       var meta = [];
       if(dl) meta.push('<span class="deadline ' + dl.cls + '">⏰ ' + esc(dl.text) + '</span>');
-      if(it.link) meta.push('<a class="link-btn" href="' + esc(it.link) + '" target="_blank" rel="noopener">↗ Open link</a>');
+      if(it.link) meta.push('<a class="link-btn" href="' + esc(it.link) + '" target="_blank" rel="noopener">' + esc(t("openLink")) + '</a>');
       if(meta.length) html += '<div class="meta">' + meta.join('<br>') + '</div>';
       if(it.notes) html += '<p class="notes">' + esc(it.notes) + '</p>';
       html += '<div class="card-actions">';
       if(it.archived){
-        html += '<button class="btn btn-ghost btn-sm" data-restore="' + it.id + '">Restore</button>' +
-          '<button class="btn btn-danger btn-sm" data-del="' + it.id + '">Delete</button>';
+        html += '<button class="btn btn-ghost btn-sm" data-restore="' + it.id + '">' + esc(t("restoreBtn")) + '</button>' +
+          '<button class="btn btn-danger btn-sm" data-del="' + it.id + '">' + esc(t("deleteBtn")) + '</button>';
       } else {
-        html += '<button class="btn btn-ghost btn-sm" data-edit="' + it.id + '">Edit</button>' +
-          '<button class="btn btn-ghost btn-sm" data-dup="' + it.id + '">Duplicate</button>' +
-          '<button class="btn btn-ghost btn-sm" data-archive="' + it.id + '">Archive</button>' +
-          '<button class="btn btn-danger btn-sm" data-del="' + it.id + '">Delete</button>';
+        html += '<button class="btn btn-ghost btn-sm" data-edit="' + it.id + '">' + esc(t("editBtn")) + '</button>' +
+          '<button class="btn btn-ghost btn-sm" data-dup="' + it.id + '">' + esc(t("dupBtn")) + '</button>' +
+          '<button class="btn btn-ghost btn-sm" data-archive="' + it.id + '">' + esc(t("archiveBtn")) + '</button>' +
+          (it.deadline ? '<button class="btn btn-ghost btn-sm" data-ics="' + it.id + '">📅 ' + esc(t("icsAdd")) + '</button>' : "") +
+          '<button class="btn btn-danger btn-sm" data-del="' + it.id + '">' + esc(t("deleteBtn")) + '</button>';
       }
       html += '</div>';
       card.innerHTML = html;
       grid.appendChild(card);
     });
   }
+
+  /* ---------- statistics charts ---------- */
+  function compactNum(v){
+    if(v >= 1000000){ var x = v / 1000000; return (x % 1 === 0 ? String(x) : x.toFixed(1).replace(".", ",")) + " jt"; }
+    if(v >= 1000){ var y = v / 1000; return (y % 1 === 0 ? String(y) : y.toFixed(1).replace(".", ",")) + " rb"; }
+    return fmtNum(Math.round(v));
+  }
+  function compactRp(v){ return "Rp" + compactNum(v); }
+  function chartColors(){
+    var dark = document.body.classList.contains("dark");
+    return {grid: dark ? "#3d2339" : "#f0e3ee", text: dark ? "#b398ad" : "#7a6a78",
+      line: "#ec4899", bar1: "#f97316", bar2: "#8b5cf6"};
+  }
+  function sizeCanvas(cv){
+    var dpr = window.devicePixelRatio || 1;
+    var w = cv.clientWidth || 600, h = 180;
+    cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+    var ctx = cv.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return {ctx: ctx, w: w, h: h};
+  }
+  function renderCharts(){
+    var colors = chartColors();
+    var byDate = {};
+    items.forEach(function(it){
+      if(it.archived) return;
+      (it.pointHistory || []).forEach(function(s){ byDate[s.d] = (byDate[s.d] || 0) + Number(s.p || 0); });
+    });
+    var dates = Object.keys(byDate).sort();
+    var cv = document.getElementById("pointsChart");
+    var empty = document.getElementById("pointsChartEmpty");
+    if(dates.length < 2){ cv.hidden = true; empty.hidden = false; }
+    else {
+      cv.hidden = false; empty.hidden = true;
+      var s = sizeCanvas(cv), ctx = s.ctx, W = s.w, H = s.h;
+      var vals = dates.map(function(d){ return byDate[d]; });
+      var max = Math.max.apply(null, vals.concat([1]));
+      var pad = {l: 48, r: 10, t: 10, b: 22};
+      ctx.strokeStyle = colors.grid; ctx.fillStyle = colors.text;
+      ctx.font = "11px 'Plus Jakarta Sans', sans-serif"; ctx.lineWidth = 1;
+      for(var g = 0; g <= 4; g++){
+        var y = pad.t + (H - pad.t - pad.b) * g / 4;
+        ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(W - pad.r, y); ctx.stroke();
+        ctx.fillText(compactNum(Math.round(max * (1 - g / 4))), 4, y + 4);
+      }
+      var x0 = pad.l, x1 = W - pad.r, y0 = pad.t, y1 = H - pad.b;
+      function px(i){ return dates.length === 1 ? (x0 + x1) / 2 : x0 + (x1 - x0) * i / (dates.length - 1); }
+      function py(v){ return y1 - (y1 - y0) * (v / max); }
+      ctx.beginPath(); ctx.moveTo(px(0), py(vals[0]));
+      for(var i = 1; i < vals.length; i++) ctx.lineTo(px(i), py(vals[i]));
+      ctx.lineTo(px(vals.length - 1), y1); ctx.lineTo(px(0), y1); ctx.closePath();
+      ctx.fillStyle = "rgba(236,72,153,0.12)"; ctx.fill();
+      ctx.beginPath(); ctx.moveTo(px(0), py(vals[0]));
+      for(var j = 1; j < vals.length; j++) ctx.lineTo(px(j), py(vals[j]));
+      ctx.strokeStyle = colors.line; ctx.lineWidth = 2; ctx.stroke();
+      ctx.fillStyle = colors.line;
+      for(var k = 0; k < vals.length; k++){ ctx.beginPath(); ctx.arc(px(k), py(vals[k]), 3, 0, Math.PI * 2); ctx.fill(); }
+      var idx = [0, Math.floor(dates.length / 2), dates.length - 1];
+      idx.forEach(function(ii, n){
+        ctx.textAlign = n === 0 ? "left" : n === 2 ? "right" : "center";
+        ctx.fillStyle = colors.text;
+        ctx.fillText(fmtDate(dates[ii]), px(ii), H - 6);
+      });
+      ctx.textAlign = "left";
+    }
+    var cats = {};
+    items.forEach(function(it){
+      if(it.archived) return;
+      var c = it.category || "Other";
+      if(!cats[c]) cats[c] = {cost: 0, value: 0};
+      cats[c].cost += Number(it.cost || 0);
+      cats[c].value += Number(it.value || 0);
+    });
+    var names = Object.keys(cats).sort();
+    var cv2 = document.getElementById("catChart");
+    var empty2 = document.getElementById("catChartEmpty");
+    var hasData = names.some(function(n){ return cats[n].cost > 0 || cats[n].value > 0; });
+    if(!hasData){ cv2.hidden = true; empty2.hidden = false; }
+    else {
+      cv2.hidden = false; empty2.hidden = true;
+      var s2 = sizeCanvas(cv2), c2 = s2.ctx, W2 = s2.w, H2 = s2.h;
+      var max2 = 1;
+      names.forEach(function(n){ max2 = Math.max(max2, cats[n].cost, cats[n].value); });
+      var pad2 = {l: 56, r: 10, t: 24, b: 22};
+      c2.strokeStyle = colors.grid; c2.fillStyle = colors.text;
+      c2.font = "11px 'Plus Jakarta Sans', sans-serif"; c2.lineWidth = 1;
+      for(var g2 = 0; g2 <= 4; g2++){
+        var y2 = pad2.t + (H2 - pad2.t - pad2.b) * g2 / 4;
+        c2.beginPath(); c2.moveTo(pad2.l, y2); c2.lineTo(W2 - pad2.r, y2); c2.stroke();
+        c2.fillText(compactRp(max2 * (1 - g2 / 4)), 4, y2 + 4);
+      }
+      c2.fillStyle = colors.bar1; c2.fillRect(pad2.l, 4, 10, 10);
+      c2.fillStyle = colors.text; c2.fillText(t("costWord"), pad2.l + 14, 13);
+      c2.fillStyle = colors.bar2; c2.fillRect(pad2.l + 74, 4, 10, 10);
+      c2.fillStyle = colors.text; c2.fillText(t("estValueWord"), pad2.l + 88, 13);
+      var slot = (W2 - pad2.l - pad2.r) / names.length;
+      names.forEach(function(n, i){
+        var bx = pad2.l + slot * i;
+        var bw = Math.min(26, slot * 0.32);
+        var gap = 4;
+        var hCost = (H2 - pad2.t - pad2.b) * (cats[n].cost / max2);
+        var hVal = (H2 - pad2.t - pad2.b) * (cats[n].value / max2);
+        c2.fillStyle = colors.bar1;
+        c2.fillRect(bx + slot / 2 - bw - gap / 2, H2 - pad2.b - hCost, bw, hCost);
+        c2.fillStyle = colors.bar2;
+        c2.fillRect(bx + slot / 2 + gap / 2, H2 - pad2.b - hVal, bw, hVal);
+        c2.fillStyle = colors.text; c2.textAlign = "center";
+        c2.fillText(n.length > 12 ? n.slice(0, 11) + "…" : n, bx + slot / 2, H2 - 6);
+        c2.textAlign = "left";
+      });
+    }
+  }
+  var chartResizeTimer = null;
+  window.addEventListener("resize", function(){
+    clearTimeout(chartResizeTimer);
+    chartResizeTimer = setTimeout(function(){ renderCharts(); }, 200);
+  });
 
   /* ---------- calendar ---------- */
   function deadlineMap(){
@@ -1096,20 +1566,21 @@
     var map = deadlineMap();
     var today = todayStr();
     var html = "";
-    ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].forEach(function(d){ html += '<div class="cal-dow">' + d + '</div>'; });
+    var DOW = settings.lang === "id" ? ["Sen","Sel","Rab","Kam","Jum","Sab","Min"] : ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+    DOW.forEach(function(d){ html += '<div class="cal-dow">' + d + '</div>'; });
     for(var i = 0; i < startDay; i++) html += '<div class="cal-day blank"></div>';
     for(var d = 1; d <= daysInMonth; d++){
       var ds = y + "-" + (m + 1 < 10 ? "0" + (m + 1) : (m + 1)) + "-" + (d < 10 ? "0" + d : d);
       var n = map[ds] ? map[ds].length : 0;
       html += '<div class="cal-day' + (ds === today ? " today" : "") + (ds === calSelected ? " selected" : "") +
         '" data-cal-day="' + ds + '">' + d +
-        (n ? '<span class="dot"></span><span class="cnt">' + n + ' deadline' + (n === 1 ? "" : "s") + '</span>' : "") + '</div>';
+        (n ? '<span class="dot"></span><span class="cnt">' + deadlineCount(n) + '</span>' : "") + '</div>';
     }
     document.getElementById("calGrid").innerHTML = html;
     var list = map[calSelected] || [];
-    document.getElementById("calDayTitle").textContent = "Deadlines — " + fmtDate(calSelected);
+    document.getElementById("calDayTitle").textContent = t("calDeadlines") + " — " + fmtDate(calSelected);
     var lh = "";
-    if(list.length === 0) lh = '<p class="panel-empty">No deadlines on this day.</p>';
+    if(list.length === 0) lh = '<p class="panel-empty">' + esc(t("noDeadlinesDay")) + '</p>';
     else list.forEach(function(it){
       var dl = deadlineInfo(it.deadline);
       lh += '<div class="row-item"><div style="flex:1; min-width:0"><div class="t-name">' + esc(it.name) + '</div>' +
@@ -1128,7 +1599,7 @@
     var html = "";
     groups.forEach(function(it){
       html += '<div class="task-group"><h3>' + esc(it.name) +
-        (it.link ? '<a href="' + esc(it.link) + '" target="_blank" rel="noopener">↗ Open</a>' : "") + '</h3>';
+        (it.link ? '<a href="' + esc(it.link) + '" target="_blank" rel="noopener">' + esc(t("openWord")) + '</a>' : "") + '</h3>';
       html += '<div class="tasks">';
       it.tasks.forEach(function(t){
         var checked = taskChecked(t);
@@ -1137,19 +1608,30 @@
         html += '<div class="task' + (checked ? " done" : "") + '">' +
           '<button class="check' + (checked ? " done" : "") + '" data-task="' + it.id + ":" + t.id + '" aria-label="Mark task"></button>' +
           '<span class="t-text">' + esc(t.text) + '</span>' +
-          (t.daily ? '<span class="daily-tag">DAILY</span>' : "") +
-          (st >= 1 ? '<span class="streak">🔥 ' + st + ' day' + (st === 1 ? "" : "s") + '</span>' : "") +
-          (lc ? '<span class="last-check">Last check-in: ' + fmtDate(lc) + '</span>' : "") +
+          (t.daily ? '<span class="daily-tag">' + esc(t("dailyTag")) + '</span>' : "") +
+          (st >= 1 ? '<span class="streak">🔥 ' + dayWord(st) + '</span>' : "") +
+          (lc ? '<span class="last-check">' + esc(t("lastCheckin")) + ' ' + fmtDate(lc) + '</span>' : "") +
           '<button class="proof-btn' + (t.proof ? " has-proof" : "") + '" data-proof="' + it.id + ":" + t.id + '" aria-label="Attach or view proof">📎</button>' +
           '<button class="t-del" data-task-del="' + it.id + ":" + t.id + '" aria-label="Delete task">×</button></div>';
       });
-      html += '<div class="add-task"><input type="text" placeholder="Add a task..." data-add-task="' + it.id + '">' +
-        '<button data-add-task-btn="' + it.id + '">Add</button></div></div></div>';
+      html += '<div class="add-task"><input type="text" placeholder="' + esc(t("addTaskPh")) + '" data-add-task="' + it.id + '">' +
+        '<button data-add-task-btn="' + it.id + '">' + esc(t("addBtn")) + '</button></div></div></div>';
     });
     box.innerHTML = html;
   }
 
   /* ---------- item / task ops ---------- */
+  function recordPoints(it, newPoints){
+    var old = Number(it.points || 0);
+    newPoints = Number(newPoints || 0);
+    if(old === newPoints) return;
+    it.pointHistory = it.pointHistory || [];
+    var d = todayStr();
+    var last = it.pointHistory[it.pointHistory.length - 1];
+    if(last && last.d === d) last.p = newPoints;
+    else it.pointHistory.push({d: d, p: newPoints});
+    if(it.pointHistory.length > 365) it.pointHistory = it.pointHistory.slice(-365);
+  }
   function findItem(id){ var f = null; items.forEach(function(x){ if(x.id === id) f = x; }); return f; }
   function findTask(it, taskId){ var f = null; (it.tasks || []).forEach(function(t){ if(t.id === taskId) f = t; }); return f; }
   function toggleTask(itemId, taskId){
@@ -1194,20 +1676,20 @@
     var box = document.getElementById("formTasks");
     box.innerHTML = "";
     if(formTasks.length === 0){
-      box.innerHTML = '<p style="font-size:13px;color:var(--muted)">No tasks yet. Example: Follow X, Join Telegram, Daily check-in.</p>';
+      box.innerHTML = '<p style="font-size:13px;color:var(--muted)">' + esc(t("noTasksForm")) + '</p>';
       return;
     }
     formTasks.forEach(function(t, i){
       var row = document.createElement("div");
       row.className = "form-task";
-      row.innerHTML = '<input type="text" value="' + esc(t.text) + '" data-ft="' + i + '" placeholder="Task...">' +
-        '<label><input type="checkbox" data-fd="' + i + '"' + (t.daily ? " checked" : "") + '> Daily</label>' +
+      row.innerHTML = '<input type="text" value="' + esc(t.text) + '" data-ft="' + i + '" placeholder="' + esc(t("taskPh")) + '">' +
+        '<label><input type="checkbox" data-fd="' + i + '"' + (t.daily ? " checked" : "") + '> ' + esc(t("dailyTag")) + '</label>' +
         '<button type="button" class="t-del" data-fx="' + i + '" aria-label="Delete task">×</button>';
       box.appendChild(row);
     });
   }
   function openForm(it, preset){
-    document.getElementById("formTitle").textContent = it ? "Edit Airdrop" : "Add Airdrop";
+    document.getElementById("formTitle").textContent = it ? t("formEdit") : t("formAdd");
     document.getElementById("editId").value = it ? it.id : "";
     document.getElementById("fName").value = it ? it.name : (preset && preset.name ? preset.name : "");
     document.getElementById("fLink").value = it ? (it.link || "") : "";
@@ -1219,6 +1701,8 @@
     document.getElementById("fDeadline").value = it ? (it.deadline || "") : "";
     document.getElementById("fValue").value = it ? (it.value || "") : "";
     document.getElementById("fEffort").value = it ? (it.effort || "medium") : "medium";
+    document.getElementById("fToken").value = it ? (it.token || "") : "";
+    document.getElementById("fExpected").value = it ? (it.expectedTokens || "") : "";
     document.getElementById("fWallet").value = it ? (it.wallet || "") : "";
     document.getElementById("fSource").value = it ? (it.source || "") : "";
     document.getElementById("fReward").value = it ? (it.reward || "") : "";
@@ -1276,6 +1760,8 @@
       cost: parseInt(document.getElementById("fCost").value, 10) || 0,
       value: parseInt(document.getElementById("fValue").value, 10) || 0,
       effort: document.getElementById("fEffort").value,
+      token: document.getElementById("fToken").value.trim(),
+      expectedTokens: parseFloat(document.getElementById("fExpected").value) || 0,
       deadline: document.getElementById("fDeadline").value,
       wallet: document.getElementById("fWallet").value.trim(),
       source: document.getElementById("fSource").value.trim(),
@@ -1288,10 +1774,16 @@
     if(!data.name) return;
     if(id){
       var ex = findItem(id);
-      if(ex){ Object.keys(data).forEach(function(k){ ex[k] = data[k]; }); addLog("Edited airdrop: " + data.name); }
+      if(ex){
+        recordPoints(ex, data.points);
+        Object.keys(data).forEach(function(k){ ex[k] = data[k]; });
+        addLog("Edited airdrop: " + data.name);
+      }
     } else {
       data.id = uid();
       data.archived = false;
+      data.pointHistory = data.points > 0 ? [{d: todayStr(), p: data.points}] : [];
+      data.lastPrice = 0; data.lastPriceAt = 0;
       data.createdAt = Date.now();
       items.push(data);
       addLog("Added airdrop: " + data.name);
@@ -1329,6 +1821,8 @@
   handleTaskClicks(document.getElementById("tasksView"));
 
   grid.addEventListener("click", function(e){
+    var icsBtn = e.target.closest("[data-ics]");
+    if(icsBtn){ var icsIt = findItem(icsBtn.getAttribute("data-ics")); if(icsIt) downloadICS([icsIt], "aksara-" + icsIt.id + ".ics"); return; }
     var editBtn = e.target.closest("[data-edit]");
     if(editBtn){ var it = findItem(editBtn.getAttribute("data-edit")); if(it) openForm(it); return; }
     var dupBtn = e.target.closest("[data-dup]");
@@ -1445,6 +1939,7 @@
     for(var i=0;i<btns.length;i++) btns[i].classList.toggle("active", btns[i].getAttribute("data-view") === v);
     if(v === "calendar") renderCalendar();
     if(v === "tasks") renderTasksView();
+    if(v === "home") renderCharts();
     if(v === "settings") renderSettingsForm();
     window.scrollTo(0, 0);
   }
@@ -1489,8 +1984,8 @@
     r.onload = function(){
       try {
         var res = importFromJson(r.result);
-        alert("Import complete: " + res.added + " new, " + res.updated + " updated.");
-      } catch(err){ alert("This file couldn't be read. Make sure it's a JSON file exported from this tracker."); }
+        alert(t("importComplete") + " " + res.added + " " + t("newWord") + ", " + res.updated + " " + t("updatedWord") + ".");
+      } catch(err){ alert(t("fileBad")); }
       e.target.value = "";
     };
     r.readAsText(f);
@@ -1504,7 +1999,7 @@
       ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
       document.body.appendChild(ta); ta.select();
       try { document.execCommand("copy"); alert(okMsg); }
-      catch(err){ alert("Copy failed — select the code manually."); }
+      catch(err){ alert(t("copyFailed")); }
       ta.remove();
     }
     if(navigator.clipboard && navigator.clipboard.writeText){
@@ -1513,7 +2008,7 @@
   }
   document.getElementById("copySyncBtn").addEventListener("click", function(){
     var code = b64e(JSON.stringify({v: 3, items: items}));
-    copyText(code, "Sync code copied (" + code.length + " characters). Paste it on your other device.");
+    copyText(code, t("syncCopiedA") + code.length + t("syncCopiedB"));
   });
   document.getElementById("pasteSyncBtn").addEventListener("click", function(){
     document.getElementById("syncCodeInput").value = "";
@@ -1532,8 +2027,57 @@
       save(); render();
       addLog("Synced from another device: " + res.added + " new, " + res.updated + " updated");
       syncOverlay.classList.remove("open");
-      alert("Sync complete: " + res.added + " new, " + res.updated + " updated.");
-    } catch(err){ alert("That code couldn't be read. Check the code and try again."); }
+      alert(t("syncComplete") + " " + res.added + " " + t("newWord") + ", " + res.updated + " " + t("updatedWord") + ".");
+    } catch(err){ alert(t("syncBad")); }
+  });
+
+  /* ---------- calendar export (.ics) ---------- */
+  function icsEscape(s){
+    return String(s || "").replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\n/g, "\\n");
+  }
+  function icsDate(dstr){ return dstr.replace(/-/g, ""); }
+  function icsNextDay(dstr){
+    var d = new Date(dstr + "T00:00:00"); d.setDate(d.getDate() + 1);
+    return todayStr(d).replace(/-/g, "");
+  }
+  function icsStamp(){
+    var d = new Date();
+    function p(n){ return (n < 10 ? "0" : "") + n; }
+    return d.getUTCFullYear() + p(d.getUTCMonth() + 1) + p(d.getUTCDate()) + "T" + p(d.getUTCHours()) + p(d.getUTCMinutes()) + p(d.getUTCSeconds()) + "Z";
+  }
+  function buildICS(list){
+    var lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Aksara Airdrop Tracker//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH"];
+    list.forEach(function(it){
+      if(!it.deadline) return;
+      var desc = [];
+      if(it.link) desc.push(it.link);
+      if(it.next) desc.push("Next step: " + it.next);
+      if(it.chain) desc.push("Chain: " + it.chain);
+      lines.push("BEGIN:VEVENT");
+      lines.push("UID:" + it.id + "@aksara-airdrop-tracker");
+      lines.push("DTSTAMP:" + icsStamp());
+      lines.push("DTSTART;VALUE=DATE:" + icsDate(it.deadline));
+      lines.push("DTEND;VALUE=DATE:" + icsNextDay(it.deadline));
+      lines.push("SUMMARY:" + icsEscape(it.name + " — airdrop deadline"));
+      if(desc.length) lines.push("DESCRIPTION:" + icsEscape(desc.join("\n")));
+      lines.push("END:VEVENT");
+    });
+    lines.push("END:VCALENDAR");
+    return lines.join("\r\n");
+  }
+  function downloadICS(list, filename){
+    var withDl = list.filter(function(it){ return it.deadline; });
+    if(withDl.length === 0){ alert(t("noDeadlinesExport")); return; }
+    var blob = new Blob([buildICS(withDl)], {type: "text/calendar;charset=utf-8"});
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 100);
+    alert(t("icsDownloaded"));
+  }
+  document.getElementById("setIcsBtn").addEventListener("click", function(){
+    downloadICS(items.filter(function(it){ return !it.archived; }), "aksara-deadlines.ics");
   });
 
   /* ---------- proof ---------- */
@@ -1590,7 +2134,7 @@
         addLog("Attached proof to task: '" + t.text + "' (" + it.name + ")");
         render();
       };
-      img.onerror = function(){ alert("That image couldn't be read."); };
+      img.onerror = function(){ alert(t("imageBad")); };
       img.src = reader.result;
     };
     reader.readAsDataURL(f);
@@ -1598,8 +2142,8 @@
 
   /* ---------- notifications ---------- */
   document.getElementById("notifyBtn").addEventListener("click", function(){
-    if(!("Notification" in window)){ alert("Browser notifications are not supported here."); return; }
-    if(Notification.permission === "denied"){ alert("Notifications are blocked for this site. Allow them in your browser settings."); return; }
+    if(!("Notification" in window)){ alert(t("notifUnsupported")); return; }
+    if(Notification.permission === "denied"){ alert(t("notifBlocked")); return; }
     if(Notification.permission === "granted"){
       settings.reminders = !settings.reminders;
       saveSettings(); renderUrgent();
@@ -1626,9 +2170,45 @@
     try { new Notification("Aksara Airdrop Tracker", {body: lines.slice(0, 3).join("\n")}); } catch(e){}
   }
 
+  /* ---------- live prices (CoinGecko, free API) ---------- */
+  function refreshPrices(manual){
+    var ids = {};
+    items.forEach(function(it){
+      if(it.archived || !it.token) return;
+      ids[resolveTokenId(it.token)] = true;
+    });
+    var list = Object.keys(ids);
+    if(list.length === 0){ if(manual) alert(t("noTokenMsg")); return; }
+    fetch("https://api.coingecko.com/api/v3/simple/price?ids=" + encodeURIComponent(list.join(",")) + "&vs_currencies=idr")
+      .then(function(r){ if(!r.ok) throw new Error("http " + r.status); return r.json(); })
+      .then(function(data){
+        var now = Date.now();
+        items.forEach(function(it){
+          if(!it.token) return;
+          var id = resolveTokenId(it.token);
+          var p = data[id] && data[id].idr;
+          if(p !== undefined && p !== null){ it.lastPrice = Number(p); it.lastPriceAt = now; }
+        });
+        pricesCache.prices = {};
+        list.forEach(function(id){ if(data[id] && data[id].idr !== undefined) pricesCache.prices[id] = Number(data[id].idr); });
+        pricesCache.at = now;
+        savePricesCache();
+        pricesStale = false;
+        save(); render();
+        if(manual) alert(t("pricesUpdated"));
+      })
+      .catch(function(){
+        pricesStale = true;
+        render();
+        if(manual) alert(t("pricesFailed"));
+      });
+  }
+  document.getElementById("refreshPricesBtn").addEventListener("click", function(){ refreshPrices(true); });
+
   /* ---------- settings ---------- */
   function renderSettingsForm(){
     document.getElementById("setName").value = settings.displayName || "";
+    document.getElementById("setLang").value = settings.lang || "en";
     document.getElementById("setTheme").value = settings.theme || "auto";
     document.getElementById("setDensity").value = settings.density || "comfortable";
     document.getElementById("setReminders").checked = !!settings.reminders;
@@ -1636,6 +2216,7 @@
     document.getElementById("setShowCalendar").checked = settings.showCalendar !== false;
     document.getElementById("setShowLog").checked = settings.showLog !== false;
     renderProfilesEditor();
+    renderPinSection();
   }
   function renderProfilesEditor(){
     var box = document.getElementById("profilesEditor");
@@ -1654,6 +2235,9 @@
   document.getElementById("setName").addEventListener("change", function(e){
     settings.displayName = e.target.value.trim() || "Xann";
     saveSettings(); renderProfile();
+  });
+  document.getElementById("setLang").addEventListener("change", function(e){
+    settings.lang = e.target.value; saveSettings(); applyI18n();
   });
   document.getElementById("setTheme").addEventListener("change", function(e){
     settings.theme = e.target.value; saveSettings(); applyTheme();
@@ -1700,17 +2284,106 @@
     if(!wipeArmed){
       wipeArmed = true;
       btn.classList.add("armed");
-      btn.textContent = "Tap again to confirm — this erases everything";
+      btn.textContent = t("wipeConfirm");
       wipeTimer = setTimeout(function(){
-        wipeArmed = false; btn.classList.remove("armed"); btn.textContent = "Delete all data";
+        wipeArmed = false; btn.classList.remove("armed"); btn.textContent = t("deleteAll");
       }, 5000);
       return;
     }
     clearTimeout(wipeTimer);
-    wipeArmed = false; btn.classList.remove("armed"); btn.textContent = "Delete all data";
+    wipeArmed = false; btn.classList.remove("armed"); btn.textContent = t("deleteAll");
     items = []; log = [];
     save(); saveLog(); render();
-    alert("All data deleted.");
+    alert(t("allDeleted"));
+  });
+
+  /* ---------- PIN lock ---------- */
+  var pinEntry = "";
+  function drawPinDots(){
+    var dots = document.querySelectorAll("#pinDots .pin-dot");
+    for(var i = 0; i < dots.length; i++) dots[i].classList.toggle("filled", i < pinEntry.length);
+  }
+  function showLock(){
+    document.getElementById("lockAvatar").textContent = ((settings.displayName || "X").charAt(0) || "X").toUpperCase();
+    pinEntry = "";
+    drawPinDots();
+    document.getElementById("pinErr").textContent = "";
+    document.getElementById("lockScreen").hidden = false;
+  }
+  function hideLock(){ document.getElementById("lockScreen").hidden = true; }
+  function pinKeyPress(k){
+    if(k === "clear"){ pinEntry = ""; }
+    else if(k === "back"){ pinEntry = pinEntry.slice(0, -1); }
+    else if(pinEntry.length < 4){ pinEntry += k; }
+    drawPinDots();
+    if(pinEntry.length === 4){
+      if(pinEntry === settings.pin){
+        pinEntry = "";
+        hideLock();
+      } else {
+        document.getElementById("pinErr").textContent = t("pinWrong");
+        var ls = document.getElementById("lockScreen");
+        ls.classList.remove("shake"); void ls.offsetWidth; ls.classList.add("shake");
+        pinEntry = "";
+        setTimeout(drawPinDots, 60);
+      }
+    }
+  }
+  document.getElementById("pinPad").addEventListener("click", function(e){
+    var b = e.target.closest("[data-pin-key]");
+    if(b) pinKeyPress(b.getAttribute("data-pin-key"));
+  });
+  function renderPinSection(){
+    var box = document.getElementById("pinSection");
+    if(!box) return;
+    var has = !!settings.pin;
+    var html = "";
+    if(!has){
+      html += '<div class="set-row"><span>' + esc(t("pinSetTitle")) + '</span></div>' +
+        '<div class="field"><label>' + esc(t("pinNew")) + '</label><input type="password" id="pinNew1" inputmode="numeric" maxlength="4" autocomplete="off"></div>' +
+        '<div class="field"><label>' + esc(t("pinConfirm")) + '</label><input type="password" id="pinNew2" inputmode="numeric" maxlength="4" autocomplete="off"></div>' +
+        '<button class="btn btn-primary btn-sm" id="pinSetBtn">' + esc(t("pinSetBtn")) + '</button>';
+    } else {
+      html += '<div class="set-row"><span>' + esc(t("pinHas")) + '</span></div>' +
+        '<div class="field"><label>' + esc(t("pinCurrent")) + '</label><input type="password" id="pinCur" inputmode="numeric" maxlength="4" autocomplete="off"></div>' +
+        '<div class="field"><label>' + esc(t("pinNew")) + '</label><input type="password" id="pinNew1" inputmode="numeric" maxlength="4" autocomplete="off"></div>' +
+        '<div class="field"><label>' + esc(t("pinConfirm")) + '</label><input type="password" id="pinNew2" inputmode="numeric" maxlength="4" autocomplete="off"></div>' +
+        '<div class="set-actions"><button class="btn btn-primary btn-sm" id="pinChangeBtn">' + esc(t("pinChange")) + '</button>' +
+        '<button class="btn btn-ghost btn-sm" id="pinRemoveBtn">' + esc(t("pinRemove")) + '</button>' +
+        '<button class="btn btn-ghost btn-sm" id="pinLockBtn">' + esc(t("pinLockNow")) + '</button></div>';
+    }
+    box.innerHTML = html;
+  }
+  document.getElementById("pinSection").addEventListener("click", function(e){
+    var setBtn = e.target.closest("#pinSetBtn");
+    if(setBtn){
+      var v1 = (document.getElementById("pinNew1").value || "").trim();
+      var v2 = (document.getElementById("pinNew2").value || "").trim();
+      if(!/^\d{4}$/.test(v1)){ alert(t("pinNeed4")); return; }
+      if(v1 !== v2){ alert(t("pinMismatch")); return; }
+      settings.pin = v1; saveSettings(); renderPinSection(); alert(t("pinSetOk"));
+      return;
+    }
+    var chBtn = e.target.closest("#pinChangeBtn");
+    if(chBtn){
+      var cur = (document.getElementById("pinCur").value || "").trim();
+      var n1 = (document.getElementById("pinNew1").value || "").trim();
+      var n2 = (document.getElementById("pinNew2").value || "").trim();
+      if(cur !== settings.pin){ alert(t("pinWrongCurrent")); return; }
+      if(!/^\d{4}$/.test(n1)){ alert(t("pinNeed4")); return; }
+      if(n1 !== n2){ alert(t("pinMismatch")); return; }
+      settings.pin = n1; saveSettings(); renderPinSection(); alert(t("pinSetOk"));
+      return;
+    }
+    var rmBtn = e.target.closest("#pinRemoveBtn");
+    if(rmBtn){
+      var cur2 = (document.getElementById("pinCur").value || "").trim();
+      if(cur2 !== settings.pin){ alert(t("pinWrongCurrent")); return; }
+      settings.pin = ""; saveSettings(); renderPinSection(); alert(t("pinRemoved"));
+      return;
+    }
+    var lkBtn = e.target.closest("#pinLockBtn");
+    if(lkBtn){ showLock(); }
   });
 
   /* ---------- init ---------- */
@@ -1718,7 +2391,10 @@
   render();
   renderSettingsForm();
   maybeNotify();
-  if(window.location.search.indexOf("add=1") !== -1){
+  if(settings.pin) showLock();
+  var hasToken = items.some(function(it){ return !it.archived && it.token; });
+  if(hasToken && Date.now() - (pricesCache.at || 0) > 10 * 60 * 1000) refreshPrices(false);
+  if(window.location.search.indexOf("add=1") !== -1 && !settings.pin){
     setView("home");
     openForm(null);
   }
