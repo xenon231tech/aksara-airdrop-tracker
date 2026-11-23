@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Aksara Airdrop Tracker</title>
+<meta name="description" content="Catat dan pantau semua airdrop yang lagi kamu kerjakan.">
+<meta name="theme-color" content="#f97316">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --orange:#f97316; --pink:#ec4899; --purple:#8b5cf6; --plum:#2b1238;
+    --ink:#241423; --muted:#7a6a78; --line:#f0e3ee; --card:#ffffff;
+    --bg:#fdf6f3; --green:#16a34a; --amber:#d97706; --violet:#7c3aed;
+    --danger:#dc2626; --radius:20px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  body{
+    font-family:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+    background:var(--bg); color:var(--ink); min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:960px; margin:0 auto; padding:20px 16px 64px}
+
+  /* Hero */
+  .hero{
+    background:linear-gradient(120deg,#f97316 0%,#ec4899 48%,#8b5cf6 100%);
+    border-radius:28px; color:#fff; padding:28px 24px 24px;
+    box-shadow:0 18px 40px -18px rgba(236,72,153,.55);
+  }
+  .hero h1{font-size:30px; font-weight:800; letter-spacing:-.5px}
+  .hero p{opacity:.92; margin-top:6px; font-size:14px; max-width:520px; line-height:1.55}
+  .stats{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:20px}
+  .stat{background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.28);
+    border-radius:16px; padding:12px 14px; backdrop-filter:blur(4px)}
+  .stat b{display:block; font-size:24px; font-weight:800; line-height:1.1}
+  .stat span{font-size:11.5px; opacity:.9; font-weight:600; letter-spacing:.2px}
+  @media (max-width:640px){ .stats{grid-template-columns:repeat(2,1fr)} .hero h1{font-size:25px} }
+
+  /* Toolbar */
+  .toolbar{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin:20px 0 14px}
+  .search{flex:1; min-width:200px; display:flex; align-items:center; gap:8px;
+    background:#fff; border:1.5px solid var(--line); border-radius:999px; padding:10px 16px}
+  .search input{border:0; outline:0; width:100%; font:inherit; font-size:14px; color:var(--ink); background:transparent}
+  .search input::placeholder{color:#b39aad}
+  .btn{border:0; cursor:pointer; font:inherit; font-weight:700; border-radius:999px;
+    padding:11px 20px; font-size:14px; transition:transform .08s ease, box-shadow .15s ease}
+  .btn:active{transform:scale(.97)}
+  .btn-primary{background:linear-gradient(120deg,var(--orange),var(--pink)); color:#fff;
+    box-shadow:0 10px 22px -10px rgba(236,72,153,.7)}
+  .btn-ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink)}
+  .chips{display:flex; gap:8px; flex-wrap:wrap}
+  .chip{border:1.5px solid var(--line); background:#fff; color:var(--muted);
+    border-radius:999px; padding:8px 14px; font:inherit; font-size:13px; font-weight:700; cursor:pointer}
+  .chip.active{background:var(--plum); border-color:var(--plum); color:#fff}
+
+  /* Cards */
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:18px; display:flex; flex-direction:column; gap:10px;
+    box-shadow:0 6px 18px -12px rgba(43,18,56,.25)}
+  .card-top{display:flex; justify-content:space-between; align-items:flex-start; gap:10px}
+  .card h3{font-size:17px; font-weight:800; line-height:1.3; overflow-wrap:anywhere}
+  .badge{flex:none; font-size:11.5px; font-weight:800; padding:5px 10px; border-radius:999px; letter-spacing:.2px}
+  .badge-running{background:#ffedd5; color:#b45309}
+  .badge-waiting{background:#ede9fe; color:#6d28d9}
+  .badge-done{background:#dcfce7; color:#15803d}
+  .meta{font-size:13px; color:var(--muted); line-height:1.6}
+  .meta b{color:var(--ink)}
+  .points{font-size:22px; font-weight:800; color:var(--plum)}
+  .points small{font-size:12px; color:var(--muted); font-weight:700}
+  .next{background:#fdf2f8; border:1px dashed #f9a8d4; border-radius:12px; padding:10px 12px; font-size:13px; line-height:1.5}
+  .next b{color:#be185d}
+  .notes{font-size:13px; color:var(--muted); line-height:1.55; white-space:pre-wrap; overflow-wrap:anywhere}
+  .deadline{font-size:12.5px; font-weight:700}
+  .deadline.over{color:var(--danger)}
+  .deadline.soon{color:var(--amber)}
+  .card-actions{display:flex; gap:8px; margin-top:auto; padding-top:6px}
+  .btn-sm{padding:8px 14px; font-size:13px}
+  .btn-danger{background:#fef2f2; color:var(--danger); border:1.5px solid #fecaca}
+  .link-btn{display:inline-flex; align-items:center; gap:6px; color:var(--pink); font-weight:700; font-size:13px; text-decoration:none}
+  .link-btn:hover{text-decoration:underline}
+
+  .empty{background:#fff; border:1.5px dashed #e9c6de; border-radius:24px; padding:44px 24px; text-align:center}
+  .empty .glyph{font-size:44px}
+  .empty h2{font-size:19px; margin:10px 0 6px}
+  .empty p{color:var(--muted); font-size:14px; line-height:1.6; max-width:420px; margin:0 auto 18px}
+
+  /* Form sheet */
+  .overlay{position:fixed; inset:0; background:rgba(43,18,56,.55); display:none;
+    align-items:flex-end; justify-content:center; z-index:50; padding:0}
+  .overlay.open{display:flex}
+  .sheet{background:#fff; width:100%; max-width:560px; max-height:92vh; overflow:auto;
+    border-radius:24px 24px 0 0; padding:22px 20px 28px}
+  @media (min-width:640px){ .overlay{align-items:center; padding:20px} .sheet{border-radius:24px} }
+  .sheet h2{font-size:20px; margin-bottom:4px}
+  .sheet .sub{color:var(--muted); font-size:13px; margin-bottom:16px}
+  .field{margin-bottom:12px}
+  .field label{display:block; font-size:12.5px; font-weight:700; margin-bottom:5px; color:var(--plum)}
+  .field input,.field select,.field textarea{width:100%; font:inherit; font-size:14px;
+    border:1.5px solid var(--line); border-radius:12px; padding:11px 13px; outline:0; background:#fff; color:var(--ink)}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--pink); box-shadow:0 0 0 3px rgba(236,72,153,.15)}
+  .field textarea{min-height:74px; resize:vertical}
+  .row2{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+  .sheet-actions{display:flex; gap:10px; margin-top:18px}
+  .sheet-actions .btn{flex:1}
+  .confirm-box{background:#fef2f2; border:1px solid #fecaca; border-radius:14px; padding:14px; font-size:14px; line-height:1.55; margin-bottom:14px}
+  footer{text-align:center; color:var(--muted); font-size:12px; margin-top:28px; line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <h1>Aksara Airdrop Tracker</h1>
+    <p>Semua airdrop yang lagi kamu kerjakan, dalam satu tempat. Catat progresnya, jangan sampai ada langkah yang kelewat.</p>
+    <div class="stats">
+      <div class="stat"><b id="totalPoints">0</b><span>TOTAL POIN</span></div>
+      <div class="stat"><b id="countRunning">0</b><span>LAGI JALAN</span></div>
+      <div class="stat"><b id="countWaiting">0</b><span>NUNGGU</span></div>
+      <div class="stat"><b id="countDone">0</b><span>SELESAI</span></div>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <div class="search"><span>🔍</span><input id="searchInput" type="search" placeholder="Cari airdrop..." aria-label="Cari airdrop"></div>
+    <button class="btn btn-primary" id="addBtn">+ Tambah Airdrop</button>
+  </div>
+  <div class="chips" id="filterChips">
+    <button class="chip active" data-filter="all">Semua</button>
+    <button class="chip" data-filter="running">Lagi jalan</button>
+    <button class="chip" data-filter="waiting">Nunggu</button>
+    <button class="chip" data-filter="done">Selesai</button>
+  </div>
+
+  <div style="height:16px"></div>
+  <main class="grid" id="grid"></main>
+  <div class="empty" id="emptyState" hidden>
+    <div class="glyph">🪂</div>
+    <h2>Belum ada airdrop</h2>
+    <p>Tracker masih kosong. Tambah airdrop pertama kamu — isi nama, link, sama langkah berikutnya, biar gampang dipantau.</p>
+    <button class="btn btn-primary" id="emptyAddBtn">+ Tambah Airdrop</button>
+  </div>
+
+  <footer>Data tersimpan di browser kamu (localStorage).<br>Tambah ke layar utama dari menu browser biar kebuka kayak aplikasi.</footer>
+</div>
+
+<!-- Form tambah / edit -->
+<div class="overlay" id="formOverlay" role="dialog" aria-modal="true">
+  <form class="sheet" id="airdropForm">
+    <h2 id="formTitle">Tambah Airdrop</h2>
+    <p class="sub">Isi yang kamu tahu aja — sisanya bisa diedit nanti.</p>
+    <input type="hidden" id="editId">
+    <div class="field">
+      <label for="fName">Nama airdrop *</label>
+      <input id="fName" required maxlength="80" placeholder="contoh: Dow Protocol">
+    </div>
+    <div class="field">
+      <label for="fLink">Link</label>
+      <input id="fLink" type="url" placeholder="https://...">
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label for="fStatus">Status</label>
+        <select id="fStatus">
+          <option value="running">Lagi jalan</option>
+          <option value="waiting">Nunggu</option>
+          <option value="done">Selesai</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="fPoints">Poin / progres</label>
+        <input id="fPoints" type="number" min="0" step="1" placeholder="0">
+      </div>
+    </div>
+    <div class="field">
+      <label for="fNext">Langkah berikutnya</label>
+      <input id="fNext" maxlength="140" placeholder="contoh: Check-in harian">
+    </div>
+    <div class="field">
+      <label for="fDeadline">Deadline</label>
+      <input id="fDeadline" type="date">
+    </div>
+    <div class="field">
+      <label for="fNotes">Catatan</label>
+      <textarea id="fNotes" maxlength="500" placeholder="Wallet yang dipakai, syarat, dll."></textarea>
+    </div>
+    <div class="sheet-actions">
+      <button type="button" class="btn btn-ghost" id="cancelBtn">Batal</button>
+      <button type="submit" class="btn btn-primary">Simpan</button>
+    </div>
+  </form>
+</div>
+
+<!-- Konfirmasi hapus -->
+<div class="overlay" id="deleteOverlay" role="dialog" aria-modal="true">
+  <div class="sheet">
+    <h2>Hapus airdrop ini?</h2>
+    <p class="sub">Data yang sudah dihapus tidak bisa dikembalikan.</p>
+    <div class="confirm-box" id="deleteName"></div>
+    <div class="sheet-actions">
+      <button class="btn btn-ghost" id="deleteCancelBtn">Batal</button>
+      <button class="btn btn-danger" id="deleteConfirmBtn">Ya, hapus</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var KEY = "airdrop-tracker-v1";
+  var items = load();
+  var filter = "all";
+  var query = "";
+  var deleteId = null;
+
+  var grid = document.getElementById("grid");
+  var emptyState = document.getElementById("emptyState");
+  var formOverlay = document.getElementById("formOverlay");
+  var deleteOverlay = document.getElementById("deleteOverlay");
+  var form = document.getElementById("airdropForm");
+
+  function load(){
+    try { var raw = localStorage.getItem(KEY); return raw ? JSON.parse(raw) : []; }
+    catch(e){ return []; }
+  }
+  function save(){ try { localStorage.setItem(KEY, JSON.stringify(items)); } catch(e){} }
+  function uid(){ return "a" + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+  function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+  function fmtNum(n){ return Number(n || 0).toLocaleString("id-ID"); }
+  function statusLabel(s){ return s === "running" ? "Lagi jalan" : s === "waiting" ? "Nunggu" : "Selesai"; }
+  function statusClass(s){ return s === "running" ? "badge-running" : s === "waiting" ? "badge-waiting" : "badge-done"; }
+  function deadlineInfo(d){
+    if(!d) return null;
+    var today = new Date(); today.setHours(0,0,0,0);
+    var dl = new Date(d + "T00:00:00"); if(isNaN(dl)) return null;
+    var diff = Math.round((dl - today) / 86400000);
+    var label = dl.toLocaleDateString("id-ID", {day:"numeric", month:"short", year:"numeric"});
+    if(diff < 0) return {text:"Lewat " + Math.abs(diff) + " hari • " + label, cls:"over"};
+    if(diff === 0) return {text:"Deadline hari ini • " + label, cls:"soon"};
+    if(diff <= 7) return {text:diff + " hari lagi • " + label, cls:"soon"};
+    return {text:label, cls:""};
+  }
+
+  function render(){
+    var total = 0, cRun = 0, cWait = 0, cDone = 0;
+    items.forEach(function(it){
+      total += Number(it.points || 0);
+      if(it.status === "running") cRun++;
+      else if(it.status === "waiting") cWait++;
+      else if(it.status === "done") cDone++;
+    });
+    document.getElementById("totalPoints").textContent = fmtNum(total);
+    document.getElementById("countRunning").textContent = cRun;
+    document.getElementById("countWaiting").textContent = cWait;
+    document.getElementById("countDone").textContent = cDone;
+
+    var q = query.trim().toLowerCase();
+    var list = items.filter(function(it){
+      if(filter !== "all" && it.status !== filter) return false;
+      if(q && (it.name + " " + (it.notes||"") + " " + (it.next||"")).toLowerCase().indexOf(q) === -1) return false;
+      return true;
+    });
+    list.sort(function(a,b){ return (b.updatedAt||0) - (a.updatedAt||0); });
+
+    grid.innerHTML = "";
+    emptyState.hidden = items.length !== 0;
+    if(items.length === 0){ return; }
+    if(list.length === 0){
+      grid.innerHTML = '<div class="empty" style="grid-column:1/-1"><h2>Tidak ada yang cocok</h2><p>Coba ubah filter atau kata pencarian.</p></div>';
+      return;
+    }
+    list.forEach(function(it){
+      var dl = deadlineInfo(it.deadline);
+      var card = document.createElement("article");
+      card.className = "card";
+      var html = '<div class="card-top"><h3>' + esc(it.name) + '</h3>' +
+        '<span class="badge ' + statusClass(it.status) + '">' + statusLabel(it.status) + '</span></div>';
+      html += '<div class="points">' + fmtNum(it.points) + ' <small>poin</small></div>';
+      if(it.next) html += '<div class="next">Langkah berikutnya: <b>' + esc(it.next) + '</b></div>';
+      var meta = [];
+      if(dl) meta.push('<span class="deadline ' + dl.cls + '">⏰ ' + esc(dl.text) + '</span>');
+      if(it.link) meta.push('<a class="link-btn" href="' + esc(it.link) + '" target="_blank" rel="noopener">↗ Buka link</a>');
+      if(meta.length) html += '<div class="meta">' + meta.join('<br>') + '</div>';
+      if(it.notes) html += '<p class="notes">' + esc(it.notes) + '</p>';
+      html += '<div class="card-actions">' +
+        '<button class="btn btn-ghost btn-sm" data-edit="' + it.id + '">Edit</button>' +
+        '<button class="btn btn-danger btn-sm" data-del="' + it.id + '">Hapus</button></div>';
+      card.innerHTML = html;
+      grid.appendChild(card);
+    });
+  }
+
+  function openForm(it){
+    document.getElementById("formTitle").textContent = it ? "Edit Airdrop" : "Tambah Airdrop";
+    document.getElementById("editId").value = it ? it.id : "";
+    document.getElementById("fName").value = it ? it.name : "";
+    document.getElementById("fLink").value = it ? (it.link || "") : "";
+    document.getElementById("fStatus").value = it ? it.status : "running";
+    document.getElementById("fPoints").value = it ? (it.points || "") : "";
+    document.getElementById("fNext").value = it ? (it.next || "") : "";
+    document.getElementById("fDeadline").value = it ? (it.deadline || "") : "";
+    document.getElementById("fNotes").value = it ? (it.notes || "") : "";
+    formOverlay.classList.add("open");
+    setTimeout(function(){ document.getElementById("fName").focus(); }, 50);
+  }
+  function closeForm(){ formOverlay.classList.remove("open"); }
+
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    var id = document.getElementById("editId").value;
+    var data = {
+      name: document.getElementById("fName").value.trim(),
+      link: document.getElementById("fLink").value.trim(),
+      status: document.getElementById("fStatus").value,
+      points: parseInt(document.getElementById("fPoints").value, 10) || 0,
+      next: document.getElementById("fNext").value.trim(),
+      deadline: document.getElementById("fDeadline").value,
+      notes: document.getElementById("fNotes").value.trim(),
+      updatedAt: Date.now()
+    };
+    if(!data.name) return;
+    if(id){
+      var ex = null;
+      items.forEach(function(it){ if(it.id === id) ex = it; });
+      if(ex){ Object.keys(data).forEach(function(k){ ex[k] = data[k]; }); }
+    } else {
+      data.id = uid();
+      data.createdAt = Date.now();
+      items.push(data);
+    }
+    save(); closeForm(); render();
+  });
+
+  grid.addEventListener("click", function(e){
+    var editBtn = e.target.closest("[data-edit]");
+    var delBtn = e.target.closest("[data-del]");
+    if(editBtn){
+      var it = null;
+      items.forEach(function(x){ if(x.id === editBtn.getAttribute("data-edit")) it = x; });
+      if(it) openForm(it);
+    }
+    if(delBtn){
+      deleteId = delBtn.getAttribute("data-del");
+      var it2 = null;
+      items.forEach(function(x){ if(x.id === deleteId) it2 = x; });
+      document.getElementById("deleteName").textContent = it2 ? "“" + it2.name + "”" : "";
+      deleteOverlay.classList.add("open");
+    }
+  });
+
+  document.getElementById("deleteConfirmBtn").addEventListener("click", function(){
+    items = items.filter(function(x){ return x.id !== deleteId; });
+    deleteId = null; save();
+    deleteOverlay.classList.remove("open"); render();
+  });
+  document.getElementById("deleteCancelBtn").addEventListener("click", function(){
+    deleteId = null; deleteOverlay.classList.remove("open");
+  });
+
+  document.getElementById("addBtn").addEventListener("click", function(){ openForm(null); });
+  document.getElementById("emptyAddBtn").addEventListener("click", function(){ openForm(null); });
+  document.getElementById("cancelBtn").addEventListener("click", closeForm);
+  formOverlay.addEventListener("click", function(e){ if(e.target === formOverlay) closeForm(); });
+  deleteOverlay.addEventListener("click", function(e){ if(e.target === deleteOverlay) deleteOverlay.classList.remove("open"); });
+  document.addEventListener("keydown", function(e){
+    if(e.key === "Escape"){ closeForm(); deleteOverlay.classList.remove("open"); }
+  });
+
+  document.getElementById("searchInput").addEventListener("input", function(e){
+    query = e.target.value; render();
+  });
+  document.getElementById("filterChips").addEventListener("click", function(e){
+    var chip = e.target.closest(".chip"); if(!chip) return;
+    filter = chip.getAttribute("data-filter");
+    var chips = document.querySelectorAll(".chip");
+    for(var i=0;i<chips.length;i++) chips[i].classList.toggle("active", chips[i] === chip);
+    render();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
